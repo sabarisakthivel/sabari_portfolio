@@ -86,7 +86,7 @@ export const site = {
     "Software Developer Coimbatore",
     "GoldenAxe Technology Solutions",
   ],
-  themeColor: "#FAF8F3",
+  themeColor: "#F2F5F2",
   location: {
     city: "Coimbatore",
     region: "Tamil Nadu",
@@ -656,9 +656,7 @@ export const ui = {
     projectsLabel: "shipped under this role",
   },
   stack: {
-    cloudLabel: "every skill, flat",
-    showAll: "show all",
-    showLess: "show less",
+    cloudLabel: "every skill, by domain",
   },
   built: {
     visitLive: "Visit live",

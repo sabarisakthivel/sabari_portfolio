@@ -33,19 +33,24 @@ export function DecodeText({
   const reduced = useReducedMotionSafe();
   const [display, setDisplay] = useState(text);
   const rafRef = useRef<number | null>(null);
+  const runningRef = useRef(false);
 
   const stop = useCallback(() => {
     if (rafRef.current !== null) {
       cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
     }
+    runningRef.current = false;
   }, []);
 
   useEffect(() => stop, [stop]);
 
   const run = useCallback(() => {
-    if (reduced) return;
-    stop();
+    // Swapping the text replaces the node under the cursor, which makes the
+    // browser fire another pointerover — without this guard the effect
+    // restarted every frame and looped for as long as the pointer stayed put.
+    if (reduced || runningRef.current) return;
+    runningRef.current = true;
 
     const chars = Array.from(text);
     const start = performance.now();
@@ -56,6 +61,7 @@ export function DecodeText({
       if (locked >= chars.length) {
         setDisplay(text);
         rafRef.current = null;
+        runningRef.current = false;
         return;
       }
 
@@ -71,7 +77,7 @@ export function DecodeText({
     };
 
     rafRef.current = requestAnimationFrame(tick);
-  }, [reduced, stop, text]);
+  }, [reduced, text]);
 
   return (
     <span className={className} onPointerEnter={run}>

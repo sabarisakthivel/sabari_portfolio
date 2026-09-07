@@ -21,11 +21,6 @@ const stackLines = jsonObjectLines(
  */
 const charDelayMs = Math.min(8, 1800 / totalChars(stackLines));
 
-/** Every skill once, in group order. */
-const allSkills = Array.from(
-  new Set(stack.groups.flatMap((group) => group.items)),
-);
-
 /** Requirements §S-6. The panel typewriter (M-11) lands in Phase 4. */
 export function Stack() {
   return (
@@ -46,11 +41,11 @@ export function Stack() {
         />
       </div>
 
-      <Reveal className="mt-10">
-        <p className="font-mono text-[11px] tracking-[0.12em] text-fg-faint uppercase">
-          {ui.stack.cloudLabel} · {allSkills.length}
+      <Reveal className="mt-14">
+        <p className="font-mono text-[11px] tracking-[0.14em] text-fg-faint uppercase">
+          {ui.stack.cloudLabel}
         </p>
-        <TagCloud items={allSkills} />
+        <TagCloud groups={stack.groups} />
       </Reveal>
     </Section>
   );

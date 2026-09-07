@@ -5,42 +5,44 @@
    Raw tokens live here; components must never write a hex literal.
    --------------------------------------------------------------------------- */
 :root {
-  /* Surfaces — warm paper, not white. Panels sit brighter than the page, the
-     way a light editor separates the buffer from its chrome. */
-  --bg: #faf8f3;
+  /* Palette lifted from aruneshj.me's light theme — values read out of its
+     computed custom properties, not eyeballed. Their cool green-grey paper,
+     near-black green-tinted ink, and deep green accent. */
+  --bg: #f2f5f2;
   --bg-elev: #ffffff;
-  --bg-elev-2: #f2efe7;
-  --border: #e4e0d4;
-  --border-strong: #c3bcaa;
+  --bg-elev-2: #eaeeea;
+  --border: rgba(13, 18, 16, 0.13);
+  --border-strong: rgba(13, 18, 16, 0.24);
 
-  /* Text — warm ink. All three clear 4.5:1 on every surface above. */
-  --fg: #17191c;
-  --fg-muted: #55585e;
-  --fg-faint: #666970;
+  /* Text — their --ink / --ink-muted / --ink-faint */
+  --fg: #0d1210;
+  --fg-muted: #3f4a44;
+  --fg-faint: #5d6963;
 
-  /* Accents — rust keeps the warmth the amber had; petrol replaces the teal.
-     Both are dark enough to be readable as text on paper. */
-  --accent: #b8420f;
-  --accent-2: #0f6e66;
-  --success: #166534;
+  /* Accents — their --accent and --accent-deep. `success` is nudged darker
+     than their --accent-bright, which measures 3.6:1 and would fail as text. */
+  --accent: #0d7a4e;
+  --accent-2: #0a5a3a;
+  --success: #0a6b43;
 
-  /* Syntax — a light editor theme: blue keys, rust strings, violet numbers. */
-  --syntax-key: #1d4ed8;
-  --syntax-str: #a3341c;
-  --syntax-num: #6d28d9;
-  --syntax-comment: #666970;
+  /* Syntax — they have no code panel, so these are ours, retuned to sit on the
+     cooler ground with the green carrying the keys. All clear 4.5:1. */
+  --syntax-key: #0d7a4e;
+  --syntax-str: #1d5fa8;
+  --syntax-num: #6b3fa0;
+  --syntax-comment: #5d6963;
 
   /* Hairlines, washes and lifts */
-  --inset-highlight: rgba(23, 25, 28, 0.04);
-  --dot-grid: rgba(23, 25, 28, 0.055);
-  --accent-glow: rgba(184, 66, 15, 0.1);
-  --accent-soft: rgba(184, 66, 15, 0.16);
-  --accent-2-soft: rgba(15, 110, 102, 0.14);
-  --scrim: rgba(250, 248, 243, 0.78);
-  --wash-a: rgba(184, 66, 15, 0.055);
-  --wash-b: rgba(15, 110, 102, 0.05);
-  --lift: 0 1px 2px rgba(23, 25, 28, 0.05);
-  --lift-strong: 0 4px 16px -6px rgba(23, 25, 28, 0.16);
+  --inset-highlight: rgba(13, 18, 16, 0.04);
+  --dot-grid: rgba(13, 18, 16, 0.07);
+  --accent-glow: rgba(13, 122, 78, 0.09);
+  --accent-soft: rgba(13, 122, 78, 0.18);
+  --accent-2-soft: rgba(10, 90, 58, 0.14);
+  --scrim: rgba(242, 245, 242, 0.78);
+  --lift: 0 1px 2px rgba(23, 34, 28, 0.06);
+  --lift-strong: 0 8px 30px rgba(23, 34, 28, 0.14);
+  --wash-a: rgba(13, 122, 78, 0.07);
+  --wash-b: rgba(13, 122, 78, 0.045);
 }
 
 /* ---------------------------------------------------------------------------
@@ -70,12 +72,12 @@
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, monospace;
 
-  --radius-tag: 3px;
-  --radius-btn: 4px;
-  --radius-card: 6px;
-  --radius-panel: 6px;
+  --radius-tag: 10px;
+  --radius-btn: 10px;
+  --radius-card: 14px;
+  --radius-panel: 14px;
 
-  --container-page: 1200px;
+  --container-page: 1240px;
   --container-read: 68ch; /* paragraph measure, Requirements §2.2 */
 }
 
