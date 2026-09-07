@@ -1,8 +1,17 @@
 "use client";
 
-import { motion } from "motion/react";
+import { m } from "motion/react";
 import { drawRule, fadeUp, staggerParent, VIEWPORT } from "@/lib/motion";
 import { cn } from "@/lib/utils";
+
+/**
+ * These wrappers exist only to animate, so they must never impose a width
+ * floor. As grid or flex children they would otherwise default to
+ * `min-width: auto`, and any unbreakable string inside (a domain, a shell
+ * command) would push the whole track — and with it the page — wider than the
+ * viewport. `min-w-0` lets the track shrink and the content truncate instead.
+ */
+const WRAPPER = "min-w-0";
 
 /** Requirements M-1 — a single element fades and rises into view. */
 export function Reveal({
@@ -16,11 +25,11 @@ export function Reveal({
   delay?: number;
   as?: "div" | "section" | "li" | "header";
 }) {
-  const Component = motion[as];
+  const Component = m[as];
   return (
     <Component
       data-reveal
-      className={className}
+      className={cn(WRAPPER, className)}
       variants={fadeUp}
       initial="hidden"
       whileInView="visible"
@@ -44,11 +53,11 @@ export function Stagger({
   delayChildren?: number;
   as?: "div" | "ul" | "ol" | "dl";
 }) {
-  const Component = motion[as];
+  const Component = m[as];
   return (
     <Component
       data-reveal
-      className={className}
+      className={cn(WRAPPER, className)}
       variants={staggerParent(delayChildren)}
       initial="hidden"
       whileInView="visible"
@@ -69,9 +78,9 @@ export function RevealItem({
   className?: string;
   as?: "div" | "li";
 }) {
-  const Component = motion[as];
+  const Component = m[as];
   return (
-    <Component data-reveal className={className} variants={fadeUp}>
+    <Component data-reveal className={cn(WRAPPER, className)} variants={fadeUp}>
       {children}
     </Component>
   );
@@ -80,7 +89,7 @@ export function RevealItem({
 /** The 1px accent rule beneath a section heading, drawn left to right (M-14). */
 export function AccentRule({ className }: { className?: string }) {
   return (
-    <motion.span
+    <m.span
       aria-hidden
       data-reveal
       className={cn("block h-px w-16 origin-left bg-accent", className)}

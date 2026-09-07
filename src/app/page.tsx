@@ -8,7 +8,7 @@ import { Work } from "@/components/sections/work";
 
 export default function Home() {
   return (
-    <main id="main">
+    <main id="main" tabIndex={-1} className="outline-none">
       <Hero />
       <About />
       <Work />

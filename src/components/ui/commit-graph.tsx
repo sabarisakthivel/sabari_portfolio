@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "motion/react";
+import { m } from "motion/react";
 import { EASE, useReducedMotionSafe, VIEWPORT } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
@@ -51,14 +51,14 @@ export function CommitGraph({
         fill="none"
         className="absolute top-0 left-0"
       >
-        <motion.path
+        <m.path
           d={TRUNK}
           stroke="var(--border-strong)"
           strokeWidth="1.5"
           strokeLinecap="round"
           {...draw(0)}
         />
-        <motion.path
+        <m.path
           d={BRANCH}
           stroke="var(--accent-2)"
           strokeWidth="1.5"
@@ -71,7 +71,7 @@ export function CommitGraph({
           const onBranch = index === 1 || index === 2;
           const isLast = index === CENTRES.length - 1;
           return (
-            <motion.circle
+            <m.circle
               key={cy}
               cx={onBranch ? 24 : 8}
               cy={cy}
@@ -93,7 +93,7 @@ export function CommitGraph({
         })}
       </svg>
 
-      <motion.ol
+      <m.ol
         className="ml-11"
         initial="hidden"
         whileInView="visible"
@@ -101,7 +101,7 @@ export function CommitGraph({
         variants={{ visible: { transition: { staggerChildren: 0.14, delayChildren: 0.3 } } }}
       >
         {labels.map((label, index) => (
-          <motion.li
+          <m.li
             key={label}
             variants={{
               hidden: { opacity: 0, x: -6 },
@@ -114,9 +114,9 @@ export function CommitGraph({
             style={{ height: `${ROW}px` }}
           >
             {label}
-          </motion.li>
+          </m.li>
         ))}
-      </motion.ol>
+      </m.ol>
     </div>
   );
 }

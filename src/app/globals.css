@@ -5,36 +5,42 @@
    Raw tokens live here; components must never write a hex literal.
    --------------------------------------------------------------------------- */
 :root {
-  /* Surfaces */
-  --bg: #0a0d12;
-  --bg-elev: #10151c;
-  --bg-elev-2: #161c25;
-  --border: #1f2733;
-  --border-strong: #2b3544;
+  /* Surfaces — warm paper, not white. Panels sit brighter than the page, the
+     way a light editor separates the buffer from its chrome. */
+  --bg: #faf8f3;
+  --bg-elev: #ffffff;
+  --bg-elev-2: #f2efe7;
+  --border: #e4e0d4;
+  --border-strong: #c3bcaa;
 
-  /* Text */
-  --fg: #e6eaf0;
-  --fg-muted: #8b97a8;
-  --fg-faint: #586374;
+  /* Text — warm ink. All three clear 4.5:1 on every surface above. */
+  --fg: #17191c;
+  --fg-muted: #55585e;
+  --fg-faint: #666970;
 
-  /* Accents */
-  --accent: #f5b944;
-  --accent-2: #5eead4;
-  --success: #4ade80;
+  /* Accents — rust keeps the warmth the amber had; petrol replaces the teal.
+     Both are dark enough to be readable as text on paper. */
+  --accent: #b8420f;
+  --accent-2: #0f6e66;
+  --success: #166534;
 
-  /* Syntax */
-  --syntax-key: #7dd3fc;
-  --syntax-str: #fca5a5;
-  --syntax-num: #c4b5fd;
-  --syntax-comment: #586374;
+  /* Syntax — a light editor theme: blue keys, rust strings, violet numbers. */
+  --syntax-key: #1d4ed8;
+  --syntax-str: #a3341c;
+  --syntax-num: #6d28d9;
+  --syntax-comment: #666970;
 
-  /* Derived surfaces used by chrome, glows and hairlines */
-  --inset-highlight: rgba(255, 255, 255, 0.04);
-  --dot-grid: rgba(230, 234, 240, 0.06);
-  --accent-glow: rgba(245, 185, 68, 0.08);
-  --accent-soft: rgba(245, 185, 68, 0.14);
-  --accent-2-soft: rgba(94, 234, 212, 0.12);
-  --scrim: rgba(10, 13, 18, 0.72);
+  /* Hairlines, washes and lifts */
+  --inset-highlight: rgba(23, 25, 28, 0.04);
+  --dot-grid: rgba(23, 25, 28, 0.055);
+  --accent-glow: rgba(184, 66, 15, 0.1);
+  --accent-soft: rgba(184, 66, 15, 0.16);
+  --accent-2-soft: rgba(15, 110, 102, 0.14);
+  --scrim: rgba(250, 248, 243, 0.78);
+  --wash-a: rgba(184, 66, 15, 0.055);
+  --wash-b: rgba(15, 110, 102, 0.05);
+  --lift: 0 1px 2px rgba(23, 25, 28, 0.05);
+  --lift-strong: 0 4px 16px -6px rgba(23, 25, 28, 0.16);
 }
 
 /* ---------------------------------------------------------------------------
@@ -64,10 +70,10 @@
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, monospace;
 
-  --radius-tag: 6px;
-  --radius-btn: 10px;
-  --radius-card: 14px;
-  --radius-panel: 12px;
+  --radius-tag: 3px;
+  --radius-btn: 4px;
+  --radius-card: 6px;
+  --radius-panel: 6px;
 
   --container-page: 1200px;
   --container-read: 68ch; /* paragraph measure, Requirements §2.2 */
@@ -141,9 +147,10 @@
   background-position: -1px -1px;
 }
 
-/* 1px inset top highlight shared by cards and panels */
+/* Paper lift shared by cards and panels (replaces the dark theme's inset
+   highlight, which is invisible on a light surface). */
 @utility inset-top-highlight {
-  box-shadow: inset 0 1px 0 0 var(--inset-highlight);
+  box-shadow: var(--lift);
 }
 
 /* Fades a scrolling row out at both edges (marquee) */
@@ -210,21 +217,6 @@
   animation: marquee-right 40s linear infinite;
 }
 
-/* Scroll cue at the foot of the hero */
-@keyframes scroll-nudge {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(4px);
-  }
-}
-
-@utility scroll-nudge {
-  animation: scroll-nudge 2s ease-in-out infinite;
-}
-
 /* Set before paint by the blocking script in layout.tsx, so returning visitors
    and reduced-motion users never see a frame of the deploy log (AC-3, AC-4). */
 [data-intro-skip="1"] .build-log {
@@ -253,6 +245,33 @@
   animation-play-state: running;
 }
 
+/* Entrance for above-the-fold content.
+
+   The scroll-reveal wrappers ship an inline opacity:0 that only resolves after
+   hydration, which makes anything above the fold — the hero heading especially
+   — unpaintable until the bundle runs, and it measured as a 3s LCP. Content
+   that is on screen at load uses this instead: same motion, but driven by CSS
+   from first paint. The reduced-motion override collapses it to the end state. */
+@keyframes enter-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@utility enter-up {
+  animation: enter-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Reveals that start with the page rather than waiting for an in-view trigger. */
+.type-char-auto {
+  animation-play-state: running;
+}
+
 /* Slow-drifting background wash behind the hero (M-15). Radial gradients
    rather than blurred boxes — same softness, none of the filter cost. */
 @keyframes blob-drift-a {
@@ -276,12 +295,12 @@
 }
 
 @utility blob-a {
-  background: radial-gradient(closest-side, var(--accent-soft), transparent);
+  background: radial-gradient(closest-side, var(--wash-a), transparent);
   animation: blob-drift-a 26s ease-in-out infinite;
 }
 
 @utility blob-b {
-  background: radial-gradient(closest-side, var(--accent-2-soft), transparent);
+  background: radial-gradient(closest-side, var(--wash-b), transparent);
   animation: blob-drift-b 32s ease-in-out infinite;
 }
 

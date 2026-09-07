@@ -11,11 +11,10 @@ export function MonoLabel({
   return (
     <p
       className={cn(
-        "flex items-center gap-2.5 font-mono text-xs tracking-[0.12em] text-fg-faint",
+        "font-mono text-xs tracking-[0.12em] text-fg-faint",
         className,
       )}
     >
-      <span aria-hidden className="h-px w-6 bg-border-strong" />
       {children}
     </p>
   );

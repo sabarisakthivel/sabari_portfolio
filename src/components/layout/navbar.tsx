@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion } from "motion/react";
+import { m } from "motion/react";
 import { Menu, X } from "lucide-react";
 import { Clock } from "@/components/ui/clock";
 import { Container } from "@/components/ui/container";
@@ -20,7 +20,7 @@ function StatusPill({ className }: { className?: string }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-2 rounded-full border border-border bg-bg-elev px-3 py-1.5 font-mono text-xs text-fg-muted",
+        "inline-flex items-center gap-2 rounded-btn border border-border bg-bg-elev px-3 py-1.5 font-mono text-xs text-fg-muted",
         className,
       )}
     >
@@ -34,13 +34,14 @@ function StatusPill({ className }: { className?: string }) {
 
 function Monogram() {
   return (
+    // The monogram is the only visible content on small screens, so it stays in
+    // the accessible name (an aria-label that omitted it would not match the
+    // visible text) and the full name follows for screen readers.
     <a href="#hero" className="flex items-center gap-3 rounded-btn">
-      <span
-        aria-hidden
-        className="grid size-8 shrink-0 place-items-center rounded-lg border border-accent font-mono text-xs text-accent"
-      >
+      <span className="grid size-8 shrink-0 place-items-center rounded-lg border border-accent font-mono text-xs text-accent">
         {site.shortName}
       </span>
+      <span className="sr-only">{site.name}</span>
       <span className="hidden leading-tight sm:block">
         <span className="block text-sm font-medium">{site.name}</span>
         <span className="block font-mono text-[11px] text-fg-faint">
@@ -101,7 +102,7 @@ export function Navbar() {
       className={cn(
         "sticky top-0 z-50 transition-colors duration-300",
         scrolled
-          ? "border-b border-border bg-bg/80 backdrop-blur-xl"
+          ? "border-b border-border bg-[var(--scrim)] backdrop-blur-xl"
           : "border-b border-transparent",
       )}
     >
@@ -131,7 +132,7 @@ export function Navbar() {
                     {item.label}
                   </a>
                   {active ? (
-                    <motion.span
+                    <m.span
                       layoutId="nav-underline"
                       aria-hidden
                       className="absolute inset-x-0 -bottom-0.5 h-px bg-accent"

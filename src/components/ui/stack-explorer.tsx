@@ -2,7 +2,6 @@
 
 import { useRef, useState } from "react";
 import { useInView } from "motion/react";
-import { Card } from "@/components/ui/card";
 import { CodePanel } from "@/components/ui/code-panel";
 import { VIEWPORT } from "@/lib/motion";
 import type { CodeLine } from "@/lib/syntax";
@@ -52,22 +51,28 @@ export function StackExplorer({
         />
       </div>
 
-      <div className="grid gap-4 lg:sticky lg:top-24">
-        {cards.map((card) => (
-          <Card
-            key={card.verb}
-            interactive
-            onMouseEnter={() => setActiveGroups(card.groups)}
-            onMouseLeave={() => setActiveGroups(null)}
-            className="p-6"
-          >
-            <p className="font-mono text-xs text-accent-2">{card.verb}</p>
-            <h3 className="mt-2 text-lg font-medium">{card.title}</h3>
-            <p className="mt-2 font-mono text-xs leading-relaxed text-fg-muted">
-              {card.text}
-            </p>
-          </Card>
-        ))}
+      {/* Ruled rows with the verb hanging left — not three stacked cards. */}
+      <div className="lg:sticky lg:top-24">
+        <ul className="border-t border-border">
+          {cards.map((card) => (
+            <li
+              key={card.verb}
+              onMouseEnter={() => setActiveGroups(card.groups)}
+              onMouseLeave={() => setActiveGroups(null)}
+              className="grid grid-cols-[4.5rem_minmax(0,1fr)] gap-4 border-b border-border py-5 transition-colors duration-200 hover:bg-bg-elev"
+            >
+              <span className="pt-0.5 font-mono text-xs text-accent-2">
+                {card.verb}
+              </span>
+              <div>
+                <h3 className="text-base font-medium">{card.title}</h3>
+                <p className="mt-1.5 font-mono text-xs leading-relaxed text-fg-muted">
+                  {card.text}
+                </p>
+              </div>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );

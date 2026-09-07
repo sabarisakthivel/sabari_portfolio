@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, m } from "motion/react";
 import { Check, Copy } from "lucide-react";
 import { contact, site, ui } from "@/data/content";
 import { EASE } from "@/lib/motion";
@@ -28,14 +28,14 @@ export function CopyEmail({ className }: { className?: string }) {
           .catch(() => setCopied(false));
       }}
       className={cn(
-        "group flex w-full items-center gap-3 rounded-panel border border-border bg-bg-elev-2 px-4 py-3 text-left",
+        "group flex w-full items-center gap-3 rounded-panel border border-border bg-bg-elev px-4 py-3 text-left",
         "font-mono text-xs transition-colors duration-200 hover:border-border-strong",
         className,
       )}
     >
       <span className="relative min-w-0 flex-1 truncate">
         <AnimatePresence initial={false} mode="wait">
-          <motion.span
+          <m.span
             key={copied ? "copied" : "idle"}
             initial={{ opacity: 0, y: 4 }}
             animate={{ opacity: 1, y: 0 }}
@@ -47,14 +47,14 @@ export function CopyEmail({ className }: { className?: string }) {
             )}
           >
             {copied ? contact.copiedLabel : contact.copyCommand}
-          </motion.span>
+          </m.span>
         </AnimatePresence>
       </span>
 
       <span className="relative size-4 shrink-0">
         <AnimatePresence initial={false} mode="wait">
           {copied ? (
-            <motion.span
+            <m.span
               key="check"
               initial={{ opacity: 0, scale: 0.4, rotate: -90 }}
               animate={{ opacity: 1, scale: 1, rotate: 0 }}
@@ -63,9 +63,9 @@ export function CopyEmail({ className }: { className?: string }) {
               className="absolute inset-0"
             >
               <Check className="size-4 text-success" />
-            </motion.span>
+            </m.span>
           ) : (
-            <motion.span
+            <m.span
               key="copy"
               initial={{ opacity: 0, scale: 0.4, rotate: 90 }}
               animate={{ opacity: 1, scale: 1, rotate: 0 }}
@@ -74,7 +74,7 @@ export function CopyEmail({ className }: { className?: string }) {
               className="absolute inset-0"
             >
               <Copy className="size-4 text-fg-faint group-hover:text-accent" />
-            </motion.span>
+            </m.span>
           )}
         </AnimatePresence>
       </span>

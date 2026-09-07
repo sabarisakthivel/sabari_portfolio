@@ -86,7 +86,7 @@ export const site = {
     "Software Developer Coimbatore",
     "GoldenAxe Technology Solutions",
   ],
-  themeColor: "#0A0D12",
+  themeColor: "#FAF8F3",
   location: {
     city: "Coimbatore",
     region: "Tamil Nadu",
@@ -213,7 +213,7 @@ export const hero = {
 };
 
 export const about = {
-  label: "01 — // about",
+  label: "01 — About",
   headline: ["A product is not done when it compiles.", "It's done when real users depend on it."],
   highlight: "real users depend on it",
   lead:
@@ -239,7 +239,7 @@ export const about = {
 };
 
 export const work = {
-  label: "02 — git log --career",
+  label: "02 — Git log --career",
   headline: "Deployment history.",
   roles: [
     {
@@ -322,7 +322,7 @@ export const stats = {
 };
 
 export const stack = {
-  label: "03 — cat package.json",
+  label: "03 — Cat package.json",
   headline: "The toolchain, declared.",
   kicker:
     "Everything below has shipped to production in the last year — not a wishlist.",
@@ -610,7 +610,7 @@ export const built = {
 };
 
 export const contact = {
-  label: "05 — curl -X POST /contact",
+  label: "05 — Curl -X POST /contact",
   headline: ["Let's connect", "and build something real."],
   highlight: "build something real",
   body:
@@ -625,7 +625,7 @@ export const contact = {
 };
 
 export const footer = {
-  line: "© 2026 · built with Next.js · deployed on Vercel from Coimbatore · status: operational",
+  line: "© 2026",
   links: [
     { label: "LinkedIn", href: site.links.linkedin },
     { label: "GitHub", href: site.links.github },

@@ -83,10 +83,6 @@ export function jsonObjectLines(
   return lines;
 }
 
-/** Turns a plain record into JSON entries in declaration order. */
-export function entriesOf(record: Record<string, JsonValue>): JsonEntry[] {
-  return Object.entries(record).map(([key, value]) => ({ key, value }));
-}
 
 /** Total characters across every token — used to pace the typing reveal. */
 export function totalChars(lines: readonly CodeLine[]): number {

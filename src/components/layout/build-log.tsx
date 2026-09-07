@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, m } from "motion/react";
 import { Check, Loader2 } from "lucide-react";
 import { PanelChrome } from "@/components/ui/code-panel";
 import { loader, site } from "@/data/content";
@@ -61,7 +61,7 @@ export function BuildLog() {
   return (
     <AnimatePresence>
       {visible ? (
-        <motion.div
+        <m.div
           key="build-log"
           className="build-log dot-grid fixed inset-0 z-100 flex items-center justify-center bg-bg p-6"
           exit={{ y: "-100%" }}
@@ -72,7 +72,7 @@ export function BuildLog() {
             className="inset-top-highlight w-full max-w-lg overflow-hidden rounded-panel border border-border bg-bg-elev"
           >
             <PanelChrome>
-              <span className="truncate font-mono text-xs text-fg-muted">
+              <span className="min-w-0 truncate font-mono text-xs text-fg-muted">
                 {site.shortName.toLowerCase()} — deploy
               </span>
             </PanelChrome>
@@ -120,7 +120,7 @@ export function BuildLog() {
               </ul>
 
               <div className="mt-5 h-0.5 overflow-hidden rounded-full bg-bg-elev-2">
-                <motion.div
+                <m.div
                   className="h-full origin-left bg-accent"
                   initial={{ scaleX: 0 }}
                   animate={{ scaleX: 1 }}
@@ -137,7 +137,7 @@ export function BuildLog() {
           >
             {loader.skipLabel}
           </button>
-        </motion.div>
+        </m.div>
       ) : null}
     </AnimatePresence>
   );

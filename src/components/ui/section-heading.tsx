@@ -36,22 +36,30 @@ export function SectionHeading({
   const lines = typeof title === "string" ? [title] : title;
 
   return (
-    <Reveal as="header" className={cn("max-w-3xl", className)}>
+    <Reveal
+      as="header"
+      className={cn("border-t border-border pt-8", className)}
+    >
       <MonoLabel>{label}</MonoLabel>
-      <h2
-        id={id}
-        className="mt-5 text-[clamp(2rem,4.2vw,3.25rem)] leading-[1.1] font-semibold tracking-[-0.03em] text-balance"
-      >
-        {lines.map((line) => (
-          <span key={line} className="block">
-            {withHighlight(line, highlight)}
-          </span>
-        ))}
-      </h2>
-      <AccentRule className="mt-6" />
-      {kicker ? (
-        <p className="mt-6 max-w-read text-fg-muted">{kicker}</p>
-      ) : null}
+
+      {/* Wide enough that each headline line fits on one row on desktop, and no
+          `text-balance` — balancing actively splits a line that would fit. */}
+      <div className="mt-5 max-w-5xl">
+        <h2
+          id={id}
+          className="text-[clamp(1.875rem,4vw,3rem)] leading-[1.08] font-semibold tracking-[-0.035em]"
+        >
+          {lines.map((line) => (
+            <span key={line} className="block">
+              {withHighlight(line, highlight)}
+            </span>
+          ))}
+        </h2>
+        <AccentRule className="mt-6" />
+        {kicker ? (
+          <p className="mt-6 max-w-read text-fg-muted">{kicker}</p>
+        ) : null}
+      </div>
     </Reveal>
   );
 }

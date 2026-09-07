@@ -44,7 +44,6 @@ export function CodePanel({
   filename,
   lines,
   activeGroups,
-  caret = false,
   typing,
   className,
   bodyClassName,
@@ -52,12 +51,11 @@ export function CodePanel({
   filename: string;
   lines: readonly CodeLine[];
   activeGroups?: readonly string[] | null;
-  caret?: boolean;
   /**
-   * Per-character reveal (M-11). Each character gets its own span and an
-   * `animation-delay`, so the cascade runs on the compositor and every glyph is
-   * in the DOM from the first paint — no layout shift as it "types". An
-   * ancestor with `.typing-active` releases the paused animations.
+   * Typing reveal (M-11). Each token carries an `animation-delay` derived from
+   * its character offset, so the cascade runs on the compositor, all text is in
+   * the DOM from first paint (no layout shift), and it adds no extra elements.
+   * An ancestor with `.typing-active` releases the paused animations.
    */
   typing?: { charDelayMs: number };
   className?: string;
@@ -83,7 +81,7 @@ export function CodePanel({
       )}
     >
       <PanelChrome>
-        <span className="truncate font-mono text-xs text-fg-muted">
+        <span className="min-w-0 truncate font-mono text-xs text-fg-muted">
           {filename}
         </span>
       </PanelChrome>
@@ -118,31 +116,22 @@ export function CodePanel({
                 style={{ paddingLeft: `${(line.indent ?? 0) * 2}ch` }}
               >
                 {line.tokens.map((token, tokenIndex) => (
-                  <span key={tokenIndex} className={TOKEN_CLASS[token.kind]}>
-                    {typing
-                      ? Array.from(token.text).map((char, charIndex) => (
-                          <span
-                            key={charIndex}
-                            className="type-char"
-                            style={{
-                              animationDelay: `${
-                                (offsets[index][tokenIndex] + charIndex) *
-                                typing.charDelayMs
-                              }ms`,
-                            }}
-                          >
-                            {char}
-                          </span>
-                        ))
-                      : token.text}
+                  <span
+                    key={tokenIndex}
+                    className={cn(TOKEN_CLASS[token.kind], typing && "type-char")}
+                    style={
+                      typing
+                        ? {
+                            animationDelay: `${
+                              offsets[index][tokenIndex] * typing.charDelayMs
+                            }ms`,
+                          }
+                        : undefined
+                    }
+                  >
+                    {token.text}
                   </span>
                 ))}
-                {caret && index === lines.length - 1 ? (
-                  <span
-                    aria-hidden
-                    className="caret-blink ml-1 inline-block h-[1em] w-[0.55em] translate-y-[0.15em] bg-accent"
-                  />
-                ) : null}
               </code>
             </div>
           );

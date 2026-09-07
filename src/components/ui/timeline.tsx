@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useScroll, useSpring } from "motion/react";
+import { m, useScroll, useSpring } from "motion/react";
 import { EASE, useReducedMotionSafe } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
@@ -35,7 +35,7 @@ export function Timeline({
         aria-hidden
         className="absolute top-3 bottom-0 left-[7px] w-px bg-border"
       />
-      <motion.span
+      <m.span
         aria-hidden
         style={reduced ? undefined : { scaleY }}
         className="absolute top-3 bottom-0 left-[7px] w-px origin-top bg-gradient-to-b from-accent via-accent-2/50 to-transparent"
@@ -48,7 +48,7 @@ export function Timeline({
 /** A node marker that pulses once as it enters view (M-9). */
 export function TimelineDot() {
   return (
-    <motion.span
+    <m.span
       aria-hidden
       className="absolute top-1.5 left-0 size-3.5 rounded-full border-2 border-accent bg-bg shadow-[0_0_0_4px_var(--bg),0_0_14px_var(--accent-soft)]"
       initial={{ opacity: 0, scale: 0.5 }}

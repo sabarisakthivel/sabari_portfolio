@@ -1,8 +1,10 @@
 import { cn } from "@/lib/utils";
 
 /**
- * Requirements §2.3 — elevated surface, hairline border, 1px inset top
- * highlight. `interactive` adds the hover lift and accent glow.
+ * A bounded surface, used only where content genuinely needs a frame — the
+ * featured projects and the nested role projects. Repeated lists elsewhere use
+ * hairline rules instead, so the page does not read as a grid of identical
+ * boxes.
  */
 export function Card({
   as: Tag = "div",
@@ -21,7 +23,7 @@ export function Card({
       className={cn(
         "inset-top-highlight rounded-card border border-border bg-bg-elev",
         interactive &&
-          "transition-[transform,border-color,box-shadow] duration-200 hover:-translate-y-0.5 hover:border-border-strong hover:shadow-[0_10px_36px_-16px_var(--accent-soft)]",
+          "transition-[border-color,box-shadow] duration-200 hover:border-border-strong hover:shadow-[var(--lift-strong)]",
         className,
       )}
       {...rest}

@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "motion/react";
+import { m } from "motion/react";
 import type { Variants } from "motion/react";
 import { Lock, ShieldCheck } from "lucide-react";
 import { PanelChrome } from "@/components/ui/code-panel";
@@ -60,13 +60,13 @@ export function BrowserFrame({
       <PanelChrome className="gap-3">
         <span className="flex min-w-0 flex-1 items-center gap-2 rounded-full border border-border bg-bg px-3 py-1">
           <Lock className="size-3 shrink-0 text-success" />
-          <span className="truncate font-mono text-[11px] text-fg-muted">
+          <span className="min-w-0 truncate font-mono text-[11px] text-fg-muted">
             {domain}
           </span>
         </span>
       </PanelChrome>
 
-      <motion.div
+      <m.div
         className="dot-grid bg-bg p-4"
         variants={parent}
         initial="hidden"
@@ -74,7 +74,7 @@ export function BrowserFrame({
         viewport={VIEWPORT}
       >
         {theme === "ops" ? <OpsMock /> : <MatrimonyMock />}
-      </motion.div>
+      </m.div>
     </div>
   );
 }
@@ -83,7 +83,7 @@ export function BrowserFrame({
 
 function Bar({ className }: { className?: string }) {
   return (
-    <motion.span
+    <m.span
       variants={barIn}
       className={cn(
         "block h-1.5 origin-left rounded-full bg-border",
@@ -101,7 +101,7 @@ function StatusPill({
   tone: "live" | "queued";
 }) {
   return (
-    <motion.span
+    <m.span
       variants={pillIn}
       className={cn(
         "inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 font-mono text-[9px] leading-none",
@@ -117,7 +117,7 @@ function StatusPill({
         )}
       />
       {label}
-    </motion.span>
+    </m.span>
   );
 }
 
@@ -133,7 +133,7 @@ function OpsMock() {
 
   return (
     <div className="grid grid-cols-5 gap-3">
-      <motion.div
+      <m.div
         variants={blockIn}
         className="col-span-3 space-y-2 rounded-lg border border-border bg-bg-elev p-3"
       >
@@ -150,10 +150,10 @@ function OpsMock() {
             </span>
           </div>
         ))}
-      </motion.div>
+      </m.div>
 
       <div className="col-span-2 space-y-3">
-        <motion.div
+        <m.div
           variants={blockIn}
           className="relative overflow-hidden rounded-lg border border-border bg-bg-elev-2"
         >
@@ -165,7 +165,7 @@ function OpsMock() {
             <g stroke="var(--border)" strokeWidth="0.5">
               <path d="M0 22 H120 M0 45 H120 M0 68 H120 M30 0 V90 M60 0 V90 M90 0 V90" />
             </g>
-            <motion.path
+            <m.path
               d="M14 74 C36 66 30 44 52 40 C74 36 78 24 104 18"
               fill="none"
               stroke="var(--accent)"
@@ -184,15 +184,15 @@ function OpsMock() {
             <circle cx="52" cy="40" r="2.5" fill="var(--accent-2)" />
             <circle cx="104" cy="18" r="3.5" fill="var(--accent-2)" />
           </svg>
-        </motion.div>
-        <motion.div
+        </m.div>
+        <m.div
           variants={blockIn}
           className="space-y-2 rounded-lg border border-border bg-bg-elev p-3"
         >
           <Bar className="w-10 bg-accent/50" />
           <Bar className="w-full" />
           <Bar className="w-3/4" />
-        </motion.div>
+        </m.div>
       </div>
     </div>
   );
@@ -203,20 +203,20 @@ function MatrimonyMock() {
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-2">
-        <motion.span
+        <m.span
           variants={pillIn}
           className="inline-flex items-center gap-1.5 rounded-full border border-accent-2/30 bg-accent-2/10 px-2 py-0.5 font-mono text-[9px] leading-none text-accent-2"
         >
           <ShieldCheck className="size-2.5" />
           AES-256-GCM
-        </motion.span>
+        </m.span>
         <Bar className="w-16" />
         <Bar className="ml-auto w-8" />
       </div>
 
       <div className="grid grid-cols-4 gap-2">
         {[0, 1, 2, 3, 4, 5, 6, 7].map((index) => (
-          <motion.div
+          <m.div
             key={index}
             variants={blockIn}
             className="space-y-1.5 rounded-lg border border-border bg-bg-elev p-2"
@@ -229,7 +229,7 @@ function MatrimonyMock() {
             />
             <Bar className="w-full" />
             <Bar className="w-2/3" />
-          </motion.div>
+          </m.div>
         ))}
       </div>
     </div>

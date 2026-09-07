@@ -36,13 +36,13 @@ export function Contact() {
         <Reveal delay={0.1}>
           <CopyEmail />
 
-          <dl className="mt-6 divide-y divide-border overflow-hidden rounded-panel border border-border">
+          <dl className="mt-8 border-t border-border">
             {contact.meta.map((row) => (
               <div
                 key={row.key}
-                className="flex flex-wrap items-baseline gap-x-4 gap-y-1 bg-bg-elev px-4 py-3"
+                className="flex flex-wrap items-baseline gap-x-4 gap-y-1 border-b border-border py-3.5"
               >
-                <dt className="w-24 shrink-0 font-mono text-[10px] tracking-[0.14em] text-fg-faint uppercase">
+                <dt className="w-28 shrink-0 font-mono text-[10px] tracking-[0.16em] text-fg-faint uppercase">
                   {row.key}
                 </dt>
                 <dd className="font-mono text-xs text-fg">

@@ -38,7 +38,7 @@ export function Marquee({
           items.map((item) => (
             <li
               key={`${copy}-${item}`}
-              className="mr-3 shrink-0 rounded-tag border border-border bg-bg-elev px-3 py-1.5 font-mono text-xs whitespace-nowrap text-fg-muted"
+              className="mr-3 shrink-0 rounded-tag border border-border bg-bg px-3 py-1.5 font-mono text-xs whitespace-nowrap text-fg-muted"
             >
               {item}
             </li>
