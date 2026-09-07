@@ -14,6 +14,8 @@ import {
 import { loader } from "@/data/content";
 import { cn } from "@/lib/utils";
 
+export const INTRO_DONE_EVENT = "intro:done";
+
 const TOTAL_MS = 2200;
 const TICK_MS = 60;
 
@@ -44,6 +46,18 @@ export function BuildLog() {
   const [elapsed, setElapsed] = useState(0);
 
   const dismiss = useCallback(() => setVisible(false), []);
+
+  /**
+   * Fired once the overlay has finished fading, not when dismissal starts.
+   * Anything above the fold animates behind this overlay, so the hero graph
+   * waits for this; signalling at dismiss left it 95% drawn by the time the
+   * page was actually visible.
+   */
+  const announceDone = useCallback(() => {
+    const w = window as { __introDone?: boolean };
+    w.__introDone = true;
+    window.dispatchEvent(new Event(INTRO_DONE_EVENT));
+  }, []);
 
   // Reduced motion: never run the sequence (AC-4). The flag is set by the
   // blocking script in layout.tsx, which has already hidden this overlay with
@@ -88,7 +102,7 @@ export function BuildLog() {
   const span = 100 - half * 2;
 
   return (
-    <AnimatePresence>
+    <AnimatePresence onExitComplete={announceDone}>
       {visible ? (
         <m.div
           key="build-log"
