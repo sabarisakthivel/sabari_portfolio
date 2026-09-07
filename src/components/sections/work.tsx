@@ -41,7 +41,7 @@ function TimelineNode({ role, isFirst }: { role: Role; isFirst: boolean }) {
     <li className="relative pl-8 md:pl-10">
       <span
         aria-hidden
-        className="absolute top-1.5 left-0 size-3.5 rounded-full border-2 border-accent bg-bg"
+        className="absolute top-1.5 left-0 size-3.5 rounded-full border-2 border-accent bg-bg shadow-[0_0_0_4px_var(--bg),0_0_14px_var(--accent-soft)]"
       />
 
       <p className="font-mono text-xs text-fg-faint">
@@ -107,9 +107,15 @@ export function Work() {
       />
 
       <div className="relative mt-12">
+        {/* Base rail, then the glowing fill. Phase 4 scales the fill with
+            scroll progress (M-9); it is drawn in full for now. */}
         <span
           aria-hidden
           className="absolute top-3 bottom-0 left-[7px] w-px bg-border"
+        />
+        <span
+          aria-hidden
+          className="absolute top-3 bottom-0 left-[7px] w-px origin-top bg-gradient-to-b from-accent via-accent-2/50 to-transparent"
         />
         <ol className="space-y-16">
           {work.roles.map((role, index) => (

@@ -37,24 +37,26 @@ export function PanelChrome({
 
 /**
  * Requirements §2.3 — window chrome, filename tab, line numbers and
- * syntax-coloured content. `activeGroup` dims every line that does not belong
- * to the hovered group (Stack section cross-highlighting).
+ * syntax-coloured content. `activeGroups` lights the lines belonging to the
+ * hovered domain and dims the rest (Stack cross-highlighting, M-11).
  */
 export function CodePanel({
   filename,
   lines,
-  activeGroup,
+  activeGroups,
   caret = false,
   className,
   bodyClassName,
 }: {
   filename: string;
   lines: readonly CodeLine[];
-  activeGroup?: string | null;
+  activeGroups?: readonly string[] | null;
   caret?: boolean;
   className?: string;
   bodyClassName?: string;
 }) {
+  const active = activeGroups?.length ? activeGroups : null;
+
   return (
     <div
       className={cn(
@@ -75,8 +77,8 @@ export function CodePanel({
         )}
       >
         {lines.map((line, index) => {
-          const dimmed = Boolean(activeGroup) && line.group !== activeGroup;
-          const lit = Boolean(activeGroup) && line.group === activeGroup;
+          const lit = Boolean(active && line.group && active.includes(line.group));
+          const dimmed = Boolean(active) && !lit;
 
           return (
             <div
