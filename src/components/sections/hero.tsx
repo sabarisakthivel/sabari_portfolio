@@ -1,7 +1,10 @@
+import { ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Clock } from "@/components/ui/clock";
 import { CodePanel } from "@/components/ui/code-panel";
+import { CommitGraph } from "@/components/ui/commit-graph";
 import { Container } from "@/components/ui/container";
+import { Marquee } from "@/components/ui/marquee";
 import { hero } from "@/data/content";
 import { entriesOf, jsonObjectLines, type JsonValue } from "@/lib/syntax";
 import { isResolved } from "@/lib/utils";
@@ -10,15 +13,19 @@ const identityLines = jsonObjectLines(
   entriesOf(hero.identity.fields as Record<string, JsonValue>),
 );
 
-/** Requirements §S-2. Marquee, commit graph and motion arrive in Phases 2 and 4. */
+/** Two ticker rows travelling in opposite directions (M-6). */
+const half = Math.ceil(hero.marquee.length / 2);
+const marqueeRows = [hero.marquee.slice(0, half), hero.marquee.slice(half)];
+
+/** Requirements §S-2. Typewriter, tilt and path-draw arrive in Phase 4. */
 export function Hero() {
   return (
     <section
       id="hero"
       aria-labelledby="hero-heading"
-      className="scroll-mt-24 pt-12 pb-10 md:pt-20 md:pb-15"
+      className="scroll-mt-24 pt-12 md:pt-20"
     >
-      <Container className="grid items-center gap-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-16">
+      <Container className="grid items-start gap-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-16">
         <div>
           <p className="font-mono text-xs tracking-[0.18em] text-accent uppercase">
             {hero.eyebrow}
@@ -50,7 +57,9 @@ export function Hero() {
             ) : null}
           </div>
 
-          <dl className="mt-12 grid grid-cols-2 gap-px overflow-hidden rounded-panel border border-border bg-border sm:grid-cols-4">
+          <CommitGraph labels={hero.commitGraph} className="mt-10" />
+
+          <dl className="mt-10 grid grid-cols-2 gap-px overflow-hidden rounded-panel border border-border bg-border sm:grid-cols-4">
             {hero.status.map((cell) => (
               <div key={cell.key} className="bg-bg-elev px-4 py-3">
                 <dt className="font-mono text-[10px] tracking-[0.14em] text-fg-faint uppercase">
@@ -68,8 +77,29 @@ export function Hero() {
           filename={hero.identity.filename}
           lines={identityLines}
           caret
-          className="lg:justify-self-end lg:self-start"
+          className="w-full lg:sticky lg:top-24"
         />
+      </Container>
+
+      <div className="mt-16 border-y border-border py-3 md:mt-24">
+        {marqueeRows.map((row, index) => (
+          <Marquee
+            key={index}
+            items={row}
+            direction={index === 0 ? "left" : "right"}
+            durationSeconds={index === 0 ? 40 : 46}
+          />
+        ))}
+      </div>
+
+      <Container className="flex justify-center py-8">
+        <a
+          href="#about"
+          className="group flex flex-col items-center gap-1.5 font-mono text-[11px] tracking-[0.14em] text-fg-faint uppercase transition-colors duration-200 hover:text-accent"
+        >
+          {hero.scrollLabel}
+          <ChevronDown aria-hidden className="scroll-nudge size-4" />
+        </a>
       </Container>
     </section>
   );
