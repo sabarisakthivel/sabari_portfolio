@@ -322,7 +322,7 @@ export const stats = {
 };
 
 export const stack = {
-  label: "03 — Cat package.json",
+  label: "03 — Skill",
   headline: "The toolchain, declared.",
   kicker:
     "Everything below has shipped to production in the last year — not a wishlist.",
@@ -610,7 +610,7 @@ export const built = {
 };
 
 export const contact = {
-  label: "05 — Curl -X POST /contact",
+  label: "05 — Contact",
   headline: ["Let's connect", "and build something real."],
   highlight: "build something real",
   body:

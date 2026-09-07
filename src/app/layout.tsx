@@ -99,7 +99,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    // The intro-skip script below stamps `data-intro-skip` on this element
+    // before React hydrates, which is the whole point — the decision has to be
+    // made pre-paint. That deliberately makes the client attributes differ from
+    // the server HTML, so the warning is suppressed here (it only covers this
+    // element's own attributes, not the tree beneath it).
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${jetbrainsMono.variable} dot-grid`}
       >
