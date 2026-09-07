@@ -2,6 +2,7 @@ import { ArrowUpRight } from "lucide-react";
 import { BrowserFrame } from "@/components/ui/browser-frame";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Reveal, RevealItem, Stagger } from "@/components/ui/reveal";
 import { Section } from "@/components/ui/section";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Tag } from "@/components/ui/tag";
@@ -10,7 +11,8 @@ import type { FeaturedProject, Repo } from "@/data/content";
 
 function FeaturedCard({ project }: { project: FeaturedProject }) {
   return (
-    <Card as="article" interactive className="flex flex-col p-6 md:p-8">
+    <RevealItem>
+      <Card as="article" interactive className="flex h-full flex-col p-6 md:p-8">
       <p className="font-mono text-xs text-accent-2">{project.kicker}</p>
 
       <h3 className="mt-3 text-2xl font-semibold tracking-tight text-pretty">
@@ -47,13 +49,15 @@ function FeaturedCard({ project }: { project: FeaturedProject }) {
           {ui.built.visitLive}
         </Button>
       </div>
-    </Card>
+      </Card>
+    </RevealItem>
   );
 }
 
 function RepoCard({ repo }: { repo: Repo }) {
   return (
-    <Card as="li" interactive className="h-full">
+    <RevealItem as="li">
+      <Card interactive className="h-full">
       <a
         href={repo.url}
         target="_blank"
@@ -74,7 +78,8 @@ function RepoCard({ repo }: { repo: Repo }) {
           <span>{repo.role}</span>
         </div>
       </a>
-    </Card>
+      </Card>
+    </RevealItem>
   );
 }
 
@@ -90,25 +95,27 @@ export function Built() {
         title={built.headline}
       />
 
-      <div className="mt-12 grid gap-6 lg:grid-cols-2">
+      <Stagger className="mt-12 grid gap-6 lg:grid-cols-2">
         {built.featured.map((project) => (
           <FeaturedCard key={project.id} project={project} />
         ))}
-      </div>
+      </Stagger>
 
       <div className="mt-16">
-        <p className="font-mono text-[11px] tracking-[0.12em] text-fg-faint uppercase">
-          {built.reposLabel}
-        </p>
-        <ul className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <Reveal>
+          <p className="font-mono text-[11px] tracking-[0.12em] text-fg-faint uppercase">
+            {built.reposLabel}
+          </p>
+        </Reveal>
+        <Stagger as="ul" className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {built.repos.map((repo) => (
             <RepoCard key={repo.name} repo={repo} />
           ))}
-        </ul>
+        </Stagger>
       </div>
 
       <div className="mt-16 grid gap-6 lg:grid-cols-2">
-        <div>
+        <Reveal>
           <p className="font-mono text-[11px] tracking-[0.12em] text-fg-faint uppercase">
             {publication.label}
           </p>
@@ -128,9 +135,9 @@ export function Built() {
               ))}
             </ul>
           </Card>
-        </div>
+        </Reveal>
 
-        <div>
+        <Reveal delay={0.1}>
           <p className="font-mono text-[11px] tracking-[0.12em] text-fg-faint uppercase">
             {ui.built.educationLabel}
           </p>
@@ -155,7 +162,7 @@ export function Built() {
               </Card>
             ))}
           </ul>
-        </div>
+        </Reveal>
       </div>
     </Section>
   );

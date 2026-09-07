@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
 import { Check, Copy } from "lucide-react";
 import { contact, site, ui } from "@/data/content";
+import { EASE } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
-/** Requirements §S-8. The check-icon morph (M-13) is polished in Phase 4. */
+/** Requirements §S-8 / M-13 — the icon spins over into a check on success. */
 export function CopyEmail({ className }: { className?: string }) {
   const [copied, setCopied] = useState(false);
 
@@ -31,14 +33,51 @@ export function CopyEmail({ className }: { className?: string }) {
         className,
       )}
     >
-      <span className="min-w-0 flex-1 truncate text-fg-muted group-hover:text-fg">
-        {copied ? contact.copiedLabel : contact.copyCommand}
+      <span className="relative min-w-0 flex-1 truncate">
+        <AnimatePresence initial={false} mode="wait">
+          <motion.span
+            key={copied ? "copied" : "idle"}
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.18, ease: EASE }}
+            className={cn(
+              "block truncate",
+              copied ? "text-success" : "text-fg-muted group-hover:text-fg",
+            )}
+          >
+            {copied ? contact.copiedLabel : contact.copyCommand}
+          </motion.span>
+        </AnimatePresence>
       </span>
-      {copied ? (
-        <Check className="size-4 shrink-0 text-success" />
-      ) : (
-        <Copy className="size-4 shrink-0 text-fg-faint group-hover:text-accent" />
-      )}
+
+      <span className="relative size-4 shrink-0">
+        <AnimatePresence initial={false} mode="wait">
+          {copied ? (
+            <motion.span
+              key="check"
+              initial={{ opacity: 0, scale: 0.4, rotate: -90 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              exit={{ opacity: 0, scale: 0.4, rotate: 90 }}
+              transition={{ duration: 0.22, ease: EASE }}
+              className="absolute inset-0"
+            >
+              <Check className="size-4 text-success" />
+            </motion.span>
+          ) : (
+            <motion.span
+              key="copy"
+              initial={{ opacity: 0, scale: 0.4, rotate: 90 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              exit={{ opacity: 0, scale: 0.4, rotate: -90 }}
+              transition={{ duration: 0.22, ease: EASE }}
+              className="absolute inset-0"
+            >
+              <Copy className="size-4 text-fg-faint group-hover:text-accent" />
+            </motion.span>
+          )}
+        </AnimatePresence>
+      </span>
     </button>
   );
 }

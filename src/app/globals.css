@@ -225,6 +225,66 @@
   animation: scroll-nudge 2s ease-in-out infinite;
 }
 
+/* Set before paint by the blocking script in layout.tsx, so returning visitors
+   and reduced-motion users never see a frame of the deploy log (AC-3, AC-4). */
+[data-intro-skip="1"] .build-log {
+  display: none;
+}
+
+/* Per-character reveal for the stack.json panel (M-11).
+
+   Every character is its own span carrying an `animation-delay`, so the whole
+   cascade is driven by the compositor with no JS loop and — crucially — no
+   layout shift, since all the text is present from the first paint. The
+   wrapper only flips play-state when the panel scrolls into view. */
+@keyframes type-in {
+  to {
+    opacity: 1;
+  }
+}
+
+.type-char {
+  opacity: 0;
+  animation: type-in 1ms linear both;
+  animation-play-state: paused;
+}
+
+.typing-active .type-char {
+  animation-play-state: running;
+}
+
+/* Slow-drifting background wash behind the hero (M-15). Radial gradients
+   rather than blurred boxes — same softness, none of the filter cost. */
+@keyframes blob-drift-a {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(6%, -8%, 0);
+  }
+}
+
+@keyframes blob-drift-b {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(-7%, 6%, 0);
+  }
+}
+
+@utility blob-a {
+  background: radial-gradient(closest-side, var(--accent-soft), transparent);
+  animation: blob-drift-a 26s ease-in-out infinite;
+}
+
+@utility blob-b {
+  background: radial-gradient(closest-side, var(--accent-2-soft), transparent);
+  animation: blob-drift-b 32s ease-in-out infinite;
+}
+
 /* ---------------------------------------------------------------------------
    Reduced motion — Requirements §4: nothing moves beyond fades.
    Framer Motion is handled separately in src/lib/motion.ts.
@@ -239,7 +299,14 @@
   *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+    /* without this, staggered animation-delays still play out in sequence */
+    animation-delay: 0s !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  .type-char {
+    opacity: 1;
+    animation: none !important;
   }
 }

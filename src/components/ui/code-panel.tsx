@@ -45,6 +45,7 @@ export function CodePanel({
   lines,
   activeGroups,
   caret = false,
+  typing,
   className,
   bodyClassName,
 }: {
@@ -52,10 +53,27 @@ export function CodePanel({
   lines: readonly CodeLine[];
   activeGroups?: readonly string[] | null;
   caret?: boolean;
+  /**
+   * Per-character reveal (M-11). Each character gets its own span and an
+   * `animation-delay`, so the cascade runs on the compositor and every glyph is
+   * in the DOM from the first paint — no layout shift as it "types". An
+   * ancestor with `.typing-active` releases the paused animations.
+   */
+  typing?: { charDelayMs: number };
   className?: string;
   bodyClassName?: string;
 }) {
   const active = activeGroups?.length ? activeGroups : null;
+
+  // Cumulative character offset of every token, for the typing delays.
+  let cursor = 0;
+  const offsets = lines.map((line) =>
+    line.tokens.map((token) => {
+      const start = cursor;
+      cursor += token.text.length;
+      return start;
+    }),
+  );
 
   return (
     <div
@@ -101,7 +119,22 @@ export function CodePanel({
               >
                 {line.tokens.map((token, tokenIndex) => (
                   <span key={tokenIndex} className={TOKEN_CLASS[token.kind]}>
-                    {token.text}
+                    {typing
+                      ? Array.from(token.text).map((char, charIndex) => (
+                          <span
+                            key={charIndex}
+                            className="type-char"
+                            style={{
+                              animationDelay: `${
+                                (offsets[index][tokenIndex] + charIndex) *
+                                typing.charDelayMs
+                              }ms`,
+                            }}
+                          >
+                            {char}
+                          </span>
+                        ))
+                      : token.text}
                   </span>
                 ))}
                 {caret && index === lines.length - 1 ? (

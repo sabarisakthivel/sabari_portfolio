@@ -1,5 +1,6 @@
 import { Fragment } from "react";
 import { MonoLabel } from "@/components/ui/mono-label";
+import { AccentRule, Reveal } from "@/components/ui/reveal";
 import { cn } from "@/lib/utils";
 
 /** Wraps the highlighted phrase of a headline in the accent colour. */
@@ -16,7 +17,7 @@ function withHighlight(line: string, highlight?: string) {
   );
 }
 
-/** Requirements §2.3 — mono label, display heading, drawn accent rule. */
+/** Requirements §2.3 — mono label, display heading, drawn accent rule (M-14). */
 export function SectionHeading({
   id,
   label,
@@ -35,7 +36,7 @@ export function SectionHeading({
   const lines = typeof title === "string" ? [title] : title;
 
   return (
-    <header className={cn("max-w-3xl", className)}>
+    <Reveal as="header" className={cn("max-w-3xl", className)}>
       <MonoLabel>{label}</MonoLabel>
       <h2
         id={id}
@@ -47,10 +48,10 @@ export function SectionHeading({
           </span>
         ))}
       </h2>
-      <span aria-hidden className="mt-6 block h-px w-16 bg-accent" />
+      <AccentRule className="mt-6" />
       {kicker ? (
         <p className="mt-6 max-w-read text-fg-muted">{kicker}</p>
       ) : null}
-    </header>
+    </Reveal>
   );
 }

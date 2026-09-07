@@ -1,11 +1,44 @@
+"use client";
+
+import { motion } from "motion/react";
+import type { Variants } from "motion/react";
 import { Lock, ShieldCheck } from "lucide-react";
 import { PanelChrome } from "@/components/ui/code-panel";
+import { EASE, useReducedMotionSafe, VIEWPORT } from "@/lib/motion";
 import { cn } from "@/lib/utils";
+
+/* Requirements M-12 — the mock paints itself in on first view. */
+const parent: Variants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.07, delayChildren: 0.15 } },
+};
+
+const barIn: Variants = {
+  hidden: { scaleX: 0, opacity: 0 },
+  visible: {
+    scaleX: 1,
+    opacity: 1,
+    transition: { duration: 0.5, ease: EASE },
+  },
+};
+
+const blockIn: Variants = {
+  hidden: { opacity: 0, y: 8 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: EASE } },
+};
+
+const pillIn: Variants = {
+  hidden: { opacity: 0, rotateX: -90 },
+  visible: {
+    opacity: 1,
+    rotateX: 0,
+    transition: { duration: 0.5, ease: EASE, delay: 0.35 },
+  },
+};
 
 /**
  * Replaces project screenshots (Requirements §2.3 / §S-7): window chrome, a URL
  * bar with the live domain, and an abstract UI built from CSS and SVG only.
- * Phase 4 animates the body on first view (M-12).
  */
 export function BrowserFrame({
   domain,
@@ -33,9 +66,15 @@ export function BrowserFrame({
         </span>
       </PanelChrome>
 
-      <div className="dot-grid bg-bg p-4">
+      <motion.div
+        className="dot-grid bg-bg p-4"
+        variants={parent}
+        initial="hidden"
+        whileInView="visible"
+        viewport={VIEWPORT}
+      >
         {theme === "ops" ? <OpsMock /> : <MatrimonyMock />}
-      </div>
+      </motion.div>
     </div>
   );
 }
@@ -43,7 +82,15 @@ export function BrowserFrame({
 /* -------------------------------------------------------------------------- */
 
 function Bar({ className }: { className?: string }) {
-  return <span className={cn("block h-1.5 rounded-full bg-border", className)} />;
+  return (
+    <motion.span
+      variants={barIn}
+      className={cn(
+        "block h-1.5 origin-left rounded-full bg-border",
+        className,
+      )}
+    />
+  );
 }
 
 function StatusPill({
@@ -54,7 +101,8 @@ function StatusPill({
   tone: "live" | "queued";
 }) {
   return (
-    <span
+    <motion.span
+      variants={pillIn}
       className={cn(
         "inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 font-mono text-[9px] leading-none",
         tone === "live"
@@ -69,12 +117,13 @@ function StatusPill({
         )}
       />
       {label}
-    </span>
+    </motion.span>
   );
 }
 
 /** Zora: delivery board — table rows, status pills, a route map block. */
 function OpsMock() {
+  const reduced = useReducedMotionSafe();
   const rows = [
     { w: "w-2/3", tone: "live" as const, label: "live" },
     { w: "w-1/2", tone: "live" as const, label: "live" },
@@ -84,7 +133,10 @@ function OpsMock() {
 
   return (
     <div className="grid grid-cols-5 gap-3">
-      <div className="col-span-3 space-y-2 rounded-lg border border-border bg-bg-elev p-3">
+      <motion.div
+        variants={blockIn}
+        className="col-span-3 space-y-2 rounded-lg border border-border bg-bg-elev p-3"
+      >
         <div className="flex items-center justify-between border-b border-border pb-2">
           <Bar className="w-16 bg-fg-faint" />
           <Bar className="w-8" />
@@ -98,10 +150,13 @@ function OpsMock() {
             </span>
           </div>
         ))}
-      </div>
+      </motion.div>
 
       <div className="col-span-2 space-y-3">
-        <div className="relative overflow-hidden rounded-lg border border-border bg-bg-elev-2">
+        <motion.div
+          variants={blockIn}
+          className="relative overflow-hidden rounded-lg border border-border bg-bg-elev-2"
+        >
           <svg
             viewBox="0 0 120 90"
             className="h-full w-full"
@@ -110,23 +165,34 @@ function OpsMock() {
             <g stroke="var(--border)" strokeWidth="0.5">
               <path d="M0 22 H120 M0 45 H120 M0 68 H120 M30 0 V90 M60 0 V90 M90 0 V90" />
             </g>
-            <path
+            <motion.path
               d="M14 74 C36 66 30 44 52 40 C74 36 78 24 104 18"
               fill="none"
               stroke="var(--accent)"
               strokeWidth="2"
               strokeLinecap="round"
+              {...(reduced
+                ? {}
+                : {
+                    initial: { pathLength: 0 },
+                    whileInView: { pathLength: 1 },
+                    viewport: VIEWPORT,
+                    transition: { duration: 1.2, ease: EASE, delay: 0.3 },
+                  })}
             />
             <circle cx="14" cy="74" r="3.5" fill="var(--accent)" />
             <circle cx="52" cy="40" r="2.5" fill="var(--accent-2)" />
             <circle cx="104" cy="18" r="3.5" fill="var(--accent-2)" />
           </svg>
-        </div>
-        <div className="space-y-2 rounded-lg border border-border bg-bg-elev p-3">
+        </motion.div>
+        <motion.div
+          variants={blockIn}
+          className="space-y-2 rounded-lg border border-border bg-bg-elev p-3"
+        >
           <Bar className="w-10 bg-accent/50" />
           <Bar className="w-full" />
           <Bar className="w-3/4" />
-        </div>
+        </motion.div>
       </div>
     </div>
   );
@@ -137,18 +203,22 @@ function MatrimonyMock() {
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-2">
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-accent-2/30 bg-accent-2/10 px-2 py-0.5 font-mono text-[9px] leading-none text-accent-2">
+        <motion.span
+          variants={pillIn}
+          className="inline-flex items-center gap-1.5 rounded-full border border-accent-2/30 bg-accent-2/10 px-2 py-0.5 font-mono text-[9px] leading-none text-accent-2"
+        >
           <ShieldCheck className="size-2.5" />
           AES-256-GCM
-        </span>
+        </motion.span>
         <Bar className="w-16" />
         <Bar className="ml-auto w-8" />
       </div>
 
       <div className="grid grid-cols-4 gap-2">
         {[0, 1, 2, 3, 4, 5, 6, 7].map((index) => (
-          <div
+          <motion.div
             key={index}
+            variants={blockIn}
             className="space-y-1.5 rounded-lg border border-border bg-bg-elev p-2"
           >
             <span
@@ -159,7 +229,7 @@ function MatrimonyMock() {
             />
             <Bar className="w-full" />
             <Bar className="w-2/3" />
-          </div>
+          </motion.div>
         ))}
       </div>
     </div>

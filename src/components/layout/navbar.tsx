@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { motion } from "motion/react";
 import { Menu, X } from "lucide-react";
 import { Clock } from "@/components/ui/clock";
 import { Container } from "@/components/ui/container";
@@ -9,6 +10,11 @@ import { cn, isResolved } from "@/lib/utils";
 
 /** Items whose href is still a TODO_ placeholder never render (§ content rules). */
 const items = nav.filter((item) => isResolved(item.href));
+
+/** Anchor targets the observer watches, in document order. */
+const sectionIds = items
+  .filter((item) => item.href.startsWith("#"))
+  .map((item) => item.href.slice(1));
 
 function StatusPill({ className }: { className?: string }) {
   return (
@@ -45,10 +51,30 @@ function Monogram() {
   );
 }
 
-/** Requirements §S-1. Active-link underline (M-8) arrives in Phase 4. */
+/** Requirements §S-1 and M-8. */
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [activeId, setActiveId] = useState(sectionIds[0] ?? "");
+
+  // The band across the middle of the viewport decides which link is lit.
+  useEffect(() => {
+    const elements = sectionIds
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => el !== null);
+    if (elements.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const hit = entries.find((entry) => entry.isIntersecting);
+        if (hit) setActiveId(hit.target.id);
+      },
+      { rootMargin: "-45% 0px -50% 0px", threshold: 0 },
+    );
+
+    elements.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -87,19 +113,34 @@ export function Navbar() {
           className="hidden flex-1 justify-center lg:flex"
         >
           <ul className="flex items-center gap-6 font-mono text-xs">
-            {items.map((item) => (
-              <li key={item.label}>
-                <a
-                  href={item.href}
-                  {...(item.external
-                    ? { target: "_blank", rel: "noopener noreferrer" }
-                    : undefined)}
-                  className="text-fg-muted transition-colors duration-200 hover:text-fg"
-                >
-                  {item.label}
-                </a>
-              </li>
-            ))}
+            {items.map((item) => {
+              const active = item.href === `#${activeId}`;
+              return (
+                <li key={item.label} className="relative">
+                  <a
+                    href={item.href}
+                    aria-current={active ? "true" : undefined}
+                    {...(item.external
+                      ? { target: "_blank", rel: "noopener noreferrer" }
+                      : undefined)}
+                    className={cn(
+                      "block py-1 transition-colors duration-200 hover:text-fg",
+                      active ? "text-fg" : "text-fg-muted",
+                    )}
+                  >
+                    {item.label}
+                  </a>
+                  {active ? (
+                    <motion.span
+                      layoutId="nav-underline"
+                      aria-hidden
+                      className="absolute inset-x-0 -bottom-0.5 h-px bg-accent"
+                      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                    />
+                  ) : null}
+                </li>
+              );
+            })}
           </ul>
         </nav>
 

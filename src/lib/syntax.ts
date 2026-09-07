@@ -87,3 +87,12 @@ export function jsonObjectLines(
 export function entriesOf(record: Record<string, JsonValue>): JsonEntry[] {
   return Object.entries(record).map(([key, value]) => ({ key, value }));
 }
+
+/** Total characters across every token — used to pace the typing reveal. */
+export function totalChars(lines: readonly CodeLine[]): number {
+  return lines.reduce(
+    (sum, line) =>
+      sum + line.tokens.reduce((n, token) => n + token.text.length, 0),
+    0,
+  );
+}

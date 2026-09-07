@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { CopyEmail } from "@/components/ui/copy-email";
+import { Reveal } from "@/components/ui/reveal";
 import { Section } from "@/components/ui/section";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { contact, site, ui } from "@/data/content";
@@ -16,7 +17,7 @@ export function Contact() {
       />
 
       <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-16">
-        <div>
+        <Reveal>
           <p className="max-w-read text-fg-muted">{contact.body}</p>
 
           <div className="mt-8 flex flex-wrap gap-3">
@@ -30,9 +31,9 @@ export function Contact() {
               {ui.contact.githubLabel}
             </Button>
           </div>
-        </div>
+        </Reveal>
 
-        <div>
+        <Reveal delay={0.1}>
           <CopyEmail />
 
           <dl className="mt-6 divide-y divide-border overflow-hidden rounded-panel border border-border">
@@ -61,7 +62,7 @@ export function Contact() {
               </div>
             ))}
           </dl>
-        </div>
+        </Reveal>
       </div>
     </Section>
   );

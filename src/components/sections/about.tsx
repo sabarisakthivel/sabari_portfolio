@@ -1,4 +1,5 @@
 import { Card } from "@/components/ui/card";
+import { Reveal, RevealItem, Stagger } from "@/components/ui/reveal";
 import { Section } from "@/components/ui/section";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { about } from "@/data/content";
@@ -15,27 +16,33 @@ export function About() {
       />
 
       <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-16">
-        <p className="max-w-read text-xl leading-relaxed text-fg text-pretty">
-          {about.lead}
-        </p>
-        <div className="max-w-read space-y-5 text-fg-muted">
-          {about.body.map((paragraph) => (
-            <p key={paragraph.slice(0, 32)}>{paragraph}</p>
-          ))}
-        </div>
+        <Reveal>
+          <p className="max-w-read text-xl leading-relaxed text-fg text-pretty">
+            {about.lead}
+          </p>
+        </Reveal>
+        <Reveal delay={0.1}>
+          <div className="max-w-read space-y-5 text-fg-muted">
+            {about.body.map((paragraph) => (
+              <p key={paragraph.slice(0, 32)}>{paragraph}</p>
+            ))}
+          </div>
+        </Reveal>
       </div>
 
-      <ul className="mt-12 grid gap-4 md:grid-cols-3">
+      <Stagger as="ul" className="mt-12 grid gap-4 md:grid-cols-3">
         {about.principles.map((principle, index) => (
-          <Card as="li" interactive key={principle.title} className="p-6">
-            <span className="font-mono text-xs text-accent">
-              {String(index + 1).padStart(2, "0")}
-            </span>
-            <h3 className="mt-3 text-lg font-medium">{principle.title}</h3>
-            <p className="mt-2 text-sm text-fg-muted">{principle.text}</p>
-          </Card>
+          <RevealItem as="li" key={principle.title}>
+            <Card interactive className="h-full p-6">
+              <span className="font-mono text-xs text-accent">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <h3 className="mt-3 text-lg font-medium">{principle.title}</h3>
+              <p className="mt-2 text-sm text-fg-muted">{principle.text}</p>
+            </Card>
+          </RevealItem>
         ))}
-      </ul>
+      </Stagger>
     </Section>
   );
 }
