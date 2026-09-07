@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Clock } from "@/components/ui/clock";
 import { CommitGraph } from "@/components/ui/commit-graph";
 import { Container } from "@/components/ui/container";
+import { DecodeText } from "@/components/ui/decode-text";
 import { Marquee } from "@/components/ui/marquee";
 import { Typewriter } from "@/components/ui/typewriter";
 import { hero } from "@/data/content";
@@ -45,7 +46,7 @@ export function Hero() {
           className="enter-up mt-6 text-[clamp(3.25rem,13vw,10rem)] leading-[0.86] font-extrabold tracking-[-0.05em] uppercase"
           style={{ animationDelay: "60ms" }}
         >
-          {hero.name}
+          <DecodeText text={hero.name} className="inline-block" />
         </h1>
 
         <div className="mt-10 grid gap-10 border-t border-border pt-10 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-16">
