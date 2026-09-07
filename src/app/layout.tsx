@@ -1,5 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, JetBrains_Mono } from "next/font/google";
+import { Footer } from "@/components/layout/footer";
+import { Navbar } from "@/components/layout/navbar";
+import { SkipLink } from "@/components/layout/skip-link";
 import { site } from "@/data/content";
 import "./globals.css";
 
@@ -32,8 +35,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${jetbrainsMono.variable}`}>
+      <body
+        className={`${geistSans.variable} ${jetbrainsMono.variable} dot-grid`}
+      >
+        <SkipLink />
+        <Navbar />
         {children}
+        <Footer />
       </body>
     </html>
   );

@@ -43,6 +43,12 @@ export interface FeaturedProject {
   mockTheme: "ops" | "matrimony"; // drives the BrowserFrame abstract UI colours
 }
 
+export interface NavItem {
+  label: string;
+  href: string;
+  external?: boolean;
+}
+
 export interface Repo {
   name: string;
   url: string;
@@ -114,7 +120,7 @@ export const loader = {
   skipLabel: "skip ↵",
 };
 
-export const nav = [
+export const nav: NavItem[] = [
   { label: "Home", href: "#hero" },
   { label: "About", href: "#about" },
   { label: "Work", href: "#work" },
@@ -627,3 +633,39 @@ export const footer = {
   ],
   backToTop: "Back to top ↑",
 };
+
+/**
+ * Chrome labels — the small pieces of interface copy named in
+ * docs/01-REQUIREMENTS.md §3 and §5 that are not part of a content block.
+ * They live here so no component ever hardcodes a string.
+ */
+export const ui = {
+  skipLink: "Skip to content",
+  nav: {
+    ariaLabel: "Primary",
+    cta: { label: "Let's talk", href: "#contact" },
+    openMenu: "Open menu",
+    closeMenu: "Close menu",
+  },
+  statusOnline: "online",
+  work: {
+    head: "HEAD",
+    current: "now",
+    projectsLabel: "shipped under this role",
+  },
+  stack: {
+    cloudLabel: "every skill, flat",
+    showAll: "show all",
+    showLess: "show less",
+  },
+  built: {
+    visitLive: "Visit live",
+    educationLabel: "education",
+  },
+  contact: {
+    emailLabel: "Email me",
+    linkedinLabel: "LinkedIn",
+    githubLabel: "GitHub",
+    copyAria: "Copy email address to clipboard",
+  },
+} as const;
