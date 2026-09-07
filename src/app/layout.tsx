@@ -23,7 +23,8 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 /**
- * Decides before first paint whether the deploy log should play at all.
+ * Hides the deploy log before first paint for anyone who prefers reduced
+ * motion. Everyone else sees it on every load, including refreshes.
  *
  * It appends a <style> rather than setting an attribute on <html>: React
  * hydrates and diffs that element, so stamping it pre-hydration produced a
@@ -31,7 +32,7 @@ const jetbrainsMono = JetBrains_Mono({
  * did not silence. A style node React never rendered is invisible to hydration
  * and still applies before the overlay is painted.
  */
-const INTRO_SKIP_SCRIPT = `try{if(sessionStorage.getItem('sabari:intro-seen')==='1'||matchMedia('(prefers-reduced-motion: reduce)').matches){var s=document.createElement('style');s.textContent='.build-log{display:none!important}';document.head.appendChild(s);window.__introSkip=1}}catch(e){}`;
+const INTRO_SKIP_SCRIPT = `try{if(matchMedia('(prefers-reduced-motion: reduce)').matches){var s=document.createElement('style');s.textContent='.build-log{display:none!important}';document.head.appendChild(s);window.__introSkip=1}}catch(e){}`;
 
 /**
  * Scroll reveals ship with an inline `opacity:0` that only JavaScript resolves.

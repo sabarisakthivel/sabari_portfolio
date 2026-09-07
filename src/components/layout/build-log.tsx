@@ -14,7 +14,6 @@ import {
 import { loader } from "@/data/content";
 import { cn } from "@/lib/utils";
 
-const STORAGE_KEY = "sabari:intro-seen";
 const TOTAL_MS = 2200;
 const TICK_MS = 60;
 
@@ -27,33 +26,28 @@ const STAGE_ICON: Record<string, LucideIcon> = {
 };
 
 /**
- * Requirements §S-0 / M-3 — the deploy pipeline that plays once per session.
+ * Requirements §S-0 / M-3 — the deploy pipeline intro.
  *
  * A horizontal stepper: each stage is a node on a rail that fills as the run
  * progresses, with one status line and a percentage beneath it.
  *
+ * It plays on every load, refresh included — a deliberate departure from
+ * AC-3's once-per-session rule.
+ *
  * The overlay is server-rendered so it covers the page from the very first
  * paint. A blocking script in `layout.tsx` injects a stylesheet hiding it for
- * returning visitors and anyone who prefers reduced motion; this component then
- * unmounts it on mount. That ordering is what keeps returning visitors from
- * seeing a flash of terminal.
+ * anyone who prefers reduced motion; this component then unmounts it on mount.
+ * That ordering is what keeps those users from seeing a flash of terminal.
  */
 export function BuildLog() {
   const [visible, setVisible] = useState(true);
   const [elapsed, setElapsed] = useState(0);
 
-  const dismiss = useCallback(() => {
-    setVisible(false);
-    try {
-      window.sessionStorage.setItem(STORAGE_KEY, "1");
-    } catch {
-      /* private mode — the intro simply plays again next time */
-    }
-  }, []);
+  const dismiss = useCallback(() => setVisible(false), []);
 
-  // Returning visitor or reduced motion: never run the sequence (AC-3, AC-4).
-  // The flag is set by the blocking script in layout.tsx, which has already
-  // hidden this overlay with an injected stylesheet.
+  // Reduced motion: never run the sequence (AC-4). The flag is set by the
+  // blocking script in layout.tsx, which has already hidden this overlay with
+  // an injected stylesheet.
   useEffect(() => {
     if ((window as { __introSkip?: number }).__introSkip === 1) {
       setVisible(false);
