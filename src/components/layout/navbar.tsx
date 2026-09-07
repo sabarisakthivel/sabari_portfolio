@@ -5,6 +5,7 @@ import { m } from "motion/react";
 import { Menu, X } from "lucide-react";
 import { Clock } from "@/components/ui/clock";
 import { Container } from "@/components/ui/container";
+import { MonogramMark } from "@/components/ui/monogram-mark";
 import { nav, site, ui } from "@/data/content";
 import { cn, isResolved } from "@/lib/utils";
 
@@ -34,13 +35,10 @@ function StatusPill({ className }: { className?: string }) {
 
 function Monogram() {
   return (
-    // The monogram is the only visible content on small screens, so it stays in
-    // the accessible name (an aria-label that omitted it would not match the
-    // visible text) and the full name follows for screen readers.
+    // The mark is decorative, and the name beside it is hidden on small
+    // screens, so the link carries a screen-reader-only name of its own.
     <a href="#hero" className="flex items-center gap-3 rounded-btn">
-      <span className="grid size-8 shrink-0 place-items-center rounded-lg border border-accent font-mono text-xs text-accent">
-        {site.shortName}
-      </span>
+      <MonogramMark className="size-7 text-accent" />
       <span className="sr-only">{site.name}</span>
       <span className="hidden leading-tight sm:block">
         <span aria-hidden className="block text-sm font-medium">

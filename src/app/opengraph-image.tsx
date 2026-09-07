@@ -25,21 +25,19 @@ export default async function OpengraphImage() {
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: 52,
-              height: 52,
-              borderRadius: 12,
-              border: `2px solid ${tokens.accent}`,
-              color: tokens.accent,
-              fontSize: 22,
-            }}
+          <svg
+            width="56"
+            height="56"
+            viewBox="0 0 64 64"
+            fill="none"
+            stroke={tokens.accent}
+            strokeWidth={11}
+            strokeLinecap="butt"
           >
-            {site.shortName}
-          </div>
+            <path d="M52 11 H27 a11 11 0 0 0 -11 11 v3" />
+            <path d="M16 25 L48 46" />
+            <path d="M12 53 H37 a11 11 0 0 0 11 -11 v-3" />
+          </svg>
           {/* One text node: Satori requires explicit display on any element
               with more than one child, and JSX interpolation splits this. */}
           <div

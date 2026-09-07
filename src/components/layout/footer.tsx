@@ -1,4 +1,5 @@
 import { Container } from "@/components/ui/container";
+import { MonogramMark } from "@/components/ui/monogram-mark";
 import { footer, site } from "@/data/content";
 
 /** Requirements §S-9. */
@@ -7,12 +8,7 @@ export function Footer() {
     <footer className="border-t border-border">
       <Container className="flex flex-col gap-6 py-10 md:flex-row md:items-center md:justify-between">
         <div className="flex items-center gap-3">
-          <span
-            aria-hidden
-            className="grid size-8 shrink-0 place-items-center rounded-lg border border-accent font-mono text-xs text-accent"
-          >
-            {site.shortName}
-          </span>
+          <MonogramMark className="size-7 text-accent" />
           <div className="min-w-0">
             <p className="text-sm font-medium">{site.name}</p>
             <p className="font-mono text-xs text-fg-faint">{footer.line}</p>
