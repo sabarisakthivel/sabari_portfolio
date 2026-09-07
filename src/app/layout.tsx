@@ -22,8 +22,16 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
-/** Decides before first paint whether the deploy log should play at all. */
-const INTRO_SKIP_SCRIPT = `try{if(sessionStorage.getItem('sabari:intro-seen')==='1'||matchMedia('(prefers-reduced-motion: reduce)').matches){document.documentElement.dataset.introSkip='1'}}catch(e){document.documentElement.dataset.introSkip='1'}`;
+/**
+ * Decides before first paint whether the deploy log should play at all.
+ *
+ * It appends a <style> rather than setting an attribute on <html>: React
+ * hydrates and diffs that element, so stamping it pre-hydration produced a
+ * "server rendered HTML didn't match" error that `suppressHydrationWarning`
+ * did not silence. A style node React never rendered is invisible to hydration
+ * and still applies before the overlay is painted.
+ */
+const INTRO_SKIP_SCRIPT = `try{if(sessionStorage.getItem('sabari:intro-seen')==='1'||matchMedia('(prefers-reduced-motion: reduce)').matches){var s=document.createElement('style');s.textContent='.build-log{display:none!important}';document.head.appendChild(s);window.__introSkip=1}}catch(e){}`;
 
 /**
  * Scroll reveals ship with an inline `opacity:0` that only JavaScript resolves.
@@ -99,12 +107,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    // The intro-skip script below stamps `data-intro-skip` on this element
-    // before React hydrates, which is the whole point — the decision has to be
-    // made pre-paint. That deliberately makes the client attributes differ from
-    // the server HTML, so the warning is suppressed here (it only covers this
-    // element's own attributes, not the tree beneath it).
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <body
         className={`${geistSans.variable} ${jetbrainsMono.variable} dot-grid`}
       >

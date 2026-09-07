@@ -15,10 +15,10 @@ const TOTAL_MS = STAGE_MS * loader.stages.length;
  * Requirements §S-0 / M-3 — the deploy log that plays once per session.
  *
  * The overlay is server-rendered so it covers the page from the very first
- * paint. A blocking script in `layout.tsx` stamps `data-intro-skip` on <html>
- * for returning visitors and anyone who prefers reduced motion, and CSS hides
- * it before paint; this component then unmounts it on mount. That ordering is
- * what keeps returning visitors from seeing a flash of terminal.
+ * paint. A blocking script in `layout.tsx` injects a stylesheet hiding it for
+ * returning visitors and anyone who prefers reduced motion; this component then
+ * unmounts it on mount. That ordering is what keeps returning visitors from
+ * seeing a flash of terminal.
  */
 export function BuildLog() {
   const [visible, setVisible] = useState(true);
@@ -34,8 +34,10 @@ export function BuildLog() {
   }, []);
 
   // Returning visitor or reduced motion: never run the sequence (AC-3, AC-4).
+  // The flag is set by the blocking script in layout.tsx, which has already
+  // hidden this overlay with an injected stylesheet.
   useEffect(() => {
-    if (document.documentElement.dataset.introSkip === "1") {
+    if ((window as { __introSkip?: number }).__introSkip === 1) {
       setVisible(false);
       return;
     }

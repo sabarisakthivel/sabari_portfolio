@@ -43,7 +43,9 @@ function Monogram() {
       </span>
       <span className="sr-only">{site.name}</span>
       <span className="hidden leading-tight sm:block">
-        <span className="block text-sm font-medium">{site.name}</span>
+        <span aria-hidden className="block text-sm font-medium">
+          {site.name}
+        </span>
         <span className="block font-mono text-[11px] text-fg-faint">
           {site.role}
         </span>
@@ -98,80 +100,83 @@ export function Navbar() {
   }, [menuOpen]);
 
   return (
-    <header
-      className={cn(
-        "sticky top-0 z-50 transition-colors duration-300",
-        scrolled
-          ? "border-b border-border bg-[var(--scrim)] backdrop-blur-xl"
-          : "border-b border-transparent",
-      )}
-    >
-      <Container className="flex h-16 items-center gap-4">
-        <Monogram />
+    <>
+      <header
+        className={cn(
+          "sticky top-0 z-50 transition-colors duration-300",
+          scrolled
+            ? "border-b border-border bg-[var(--scrim)] backdrop-blur-xl"
+            : "border-b border-transparent",
+        )}
+      >
+        <Container className="flex h-16 items-center gap-4">
+          <Monogram />
 
-        <nav
-          aria-label={ui.nav.ariaLabel}
-          className="hidden flex-1 justify-center lg:flex"
-        >
-          <ul className="flex items-center gap-6 font-mono text-xs">
-            {items.map((item) => {
-              const active = item.href === `#${activeId}`;
-              return (
-                <li key={item.label} className="relative">
-                  <a
-                    href={item.href}
-                    aria-current={active ? "true" : undefined}
-                    {...(item.external
-                      ? { target: "_blank", rel: "noopener noreferrer" }
-                      : undefined)}
-                    className={cn(
-                      "block py-1 transition-colors duration-200 hover:text-fg",
-                      active ? "text-fg" : "text-fg-muted",
-                    )}
-                  >
-                    {item.label}
-                  </a>
-                  {active ? (
-                    <m.span
-                      layoutId="nav-underline"
-                      aria-hidden
-                      className="absolute inset-x-0 -bottom-0.5 h-px bg-accent"
-                      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                    />
-                  ) : null}
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
-
-        <div className="ml-auto flex items-center gap-3 lg:ml-0">
-          <StatusPill className="hidden md:inline-flex" />
-          <a
-            href={ui.nav.cta.href}
-            className="hidden rounded-btn bg-accent px-4 py-2 font-mono text-xs font-medium text-bg transition-[filter] duration-200 hover:brightness-110 sm:inline-block"
+          <nav
+            aria-label={ui.nav.ariaLabel}
+            className="hidden flex-1 justify-center lg:flex"
           >
-            {ui.nav.cta.label}
-          </a>
-          <button
-            type="button"
-            aria-expanded={menuOpen}
-            aria-label={menuOpen ? ui.nav.closeMenu : ui.nav.openMenu}
-            onClick={() => setMenuOpen((open) => !open)}
-            className="grid size-9 place-items-center rounded-btn border border-border text-fg-muted transition-colors duration-200 hover:border-border-strong hover:text-fg lg:hidden"
-          >
-            {menuOpen ? (
-              <X className="size-4" />
-            ) : (
-              <Menu className="size-4" />
-            )}
-          </button>
-        </div>
-      </Container>
+            <ul className="flex items-center gap-6 font-mono text-xs">
+              {items.map((item) => {
+                const active = item.href === `#${activeId}`;
+                return (
+                  <li key={item.label} className="relative">
+                    <a
+                      href={item.href}
+                      aria-current={active ? "true" : undefined}
+                      {...(item.external
+                        ? { target: "_blank", rel: "noopener noreferrer" }
+                        : undefined)}
+                      className={cn(
+                        "block py-1 transition-colors duration-200 hover:text-fg",
+                        active ? "text-fg" : "text-fg-muted",
+                      )}
+                    >
+                      {item.label}
+                    </a>
+                    {active ? (
+                      <m.span
+                        layoutId="nav-underline"
+                        aria-hidden
+                        className="absolute inset-x-0 -bottom-0.5 h-px bg-accent"
+                        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                      />
+                    ) : null}
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
 
+          <div className="ml-auto flex items-center gap-3 lg:ml-0">
+            <StatusPill className="hidden md:inline-flex" />
+            <a
+              href={ui.nav.cta.href}
+              className="hidden rounded-btn bg-accent px-4 py-2 font-mono text-xs font-medium text-bg transition-[filter] duration-200 hover:brightness-110 sm:inline-block"
+            >
+              {ui.nav.cta.label}
+            </a>
+            <button
+              type="button"
+              aria-expanded={menuOpen}
+              aria-label={menuOpen ? ui.nav.closeMenu : ui.nav.openMenu}
+              onClick={() => setMenuOpen((open) => !open)}
+              className="grid size-9 place-items-center rounded-btn border border-border text-fg-muted transition-colors duration-200 hover:border-border-strong hover:text-fg lg:hidden"
+            >
+              {menuOpen ? <X className="size-4" /> : <Menu className="size-4" />}
+            </button>
+          </div>
+        </Container>
+      </header>
+
+      {/* Deliberately a sibling of the header, not a child. Once scrolled the
+          header carries a backdrop-filter, which makes it the containing block
+          for any fixed descendant; nested inside, this overlay resolved
+          inset-0 / top-16 against a 64px-tall header and collapsed to zero
+          height, so the menu drew over the page with no background behind it. */}
       {menuOpen ? (
-        <div className="dot-grid fixed inset-0 top-16 z-40 bg-bg lg:hidden">
-          <Container className="flex h-full flex-col gap-8 py-10">
+        <div className="dot-grid fixed inset-x-0 top-16 bottom-0 z-40 overflow-y-auto bg-bg lg:hidden">
+          <Container className="flex min-h-full flex-col gap-8 py-10">
             <nav aria-label={ui.nav.ariaLabel}>
               <ul className="flex flex-col gap-1">
                 {items.map((item) => (
@@ -204,6 +209,6 @@ export function Navbar() {
           </Container>
         </div>
       ) : null}
-    </header>
+    </>
   );
 }

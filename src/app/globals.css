@@ -217,12 +217,6 @@
   animation: marquee-right 40s linear infinite;
 }
 
-/* Set before paint by the blocking script in layout.tsx, so returning visitors
-   and reduced-motion users never see a frame of the deploy log (AC-3, AC-4). */
-[data-intro-skip="1"] .build-log {
-  display: none;
-}
-
 /* Per-character reveal for the stack.json panel (M-11).
 
    Every character is its own span carrying an `animation-delay`, so the whole
