@@ -15,6 +15,11 @@ const marqueeRows = [hero.marquee.slice(0, half), hero.marquee.slice(half)];
 /**
  * Requirements §S-2.
  *
+ * Two columns from lg: all the copy on the left, the commit graph running the
+ * full height on the right. The name previously spanned the full width, which
+ * pushed the graph below the divider and left it sitting far lower than its
+ * counterpart on the reference.
+ *
  * Everything here is on screen at load, so it uses the CSS `enter-up`
  * entrance rather than the scroll-reveal wrappers — those hold content at
  * opacity 0 until hydration, which delays the hero heading's paint and with it
@@ -25,7 +30,7 @@ export function Hero() {
     <section
       id="hero"
       aria-labelledby="hero-heading"
-      className="relative scroll-mt-24 pt-14 md:pt-24"
+      className="relative scroll-mt-24 pt-14 md:pt-20"
     >
       {/* M-15 — slow-drifting wash, purely decorative */}
       <div
@@ -36,70 +41,69 @@ export function Hero() {
         <span className="blob-b absolute -top-24 right-0 size-[30rem] rounded-full" />
       </div>
 
-      <Container>
-        <p className="enter-up font-mono text-xs tracking-[0.2em] text-accent uppercase">
-          {hero.eyebrow}
-        </p>
+      <Container className="grid items-start gap-14 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-16">
+        <div className="min-w-0">
+          <p className="enter-up font-mono text-xs tracking-[0.2em] text-accent uppercase">
+            {hero.eyebrow}
+          </p>
 
-        <h1
-          id="hero-heading"
-          className="enter-up mt-6 text-[clamp(3.25rem,13vw,10rem)] leading-[0.86] font-extrabold tracking-[-0.05em] uppercase"
-          style={{ animationDelay: "60ms" }}
-        >
-          <DecodeText text={hero.name} className="inline-block" />
-        </h1>
+          <h1
+            id="hero-heading"
+            className="enter-up mt-6 text-[clamp(2.75rem,9vw,8rem)] leading-[0.9] font-extrabold tracking-[-0.05em] uppercase"
+            style={{ animationDelay: "60ms" }}
+          >
+            <DecodeText text={hero.name} className="inline-block" />
+          </h1>
 
-        <div className="mt-10 grid gap-10 border-t border-border pt-10 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-16">
-          <div className="min-w-0">
-            {/* M-5 — types in once the name has landed */}
-            <Typewriter
-              text={hero.tagline}
-              startDelayMs={320}
-              className="max-w-read text-lg leading-relaxed text-fg-muted"
-            />
+          {/* M-5 — types in once the name has landed */}
+          <Typewriter
+            text={hero.tagline}
+            startDelayMs={180}
+            className="mt-8 max-w-read text-lg leading-relaxed text-fg-muted"
+          />
 
-            <div
-              className="enter-up mt-8 flex flex-wrap items-center gap-3"
-              style={{ animationDelay: "220ms" }}
-            >
-              <Button href={hero.ctas.primary.href} variant="primary">
-                {hero.ctas.primary.label}
+          <div
+            className="enter-up mt-8 flex flex-wrap items-center gap-3"
+            style={{ animationDelay: "220ms" }}
+          >
+            <Button href={hero.ctas.primary.href} variant="primary">
+              {hero.ctas.primary.label}
+            </Button>
+            <Button href={hero.ctas.secondary.href}>
+              {hero.ctas.secondary.label}
+            </Button>
+            {/* TODO: resume button renders once site.links.resume is set */}
+            {isResolved(hero.ctas.resume.href) ? (
+              <Button href={hero.ctas.resume.href} external>
+                {hero.ctas.resume.label}
               </Button>
-              <Button href={hero.ctas.secondary.href}>
-                {hero.ctas.secondary.label}
-              </Button>
-              {/* TODO: resume button renders once site.links.resume is set */}
-              {isResolved(hero.ctas.resume.href) ? (
-                <Button href={hero.ctas.resume.href} external>
-                  {hero.ctas.resume.label}
-                </Button>
-              ) : null}
-            </div>
+            ) : null}
           </div>
 
-          {/* No divider: the reference lets the trunk itself be the vertical
-              line in this part of the hero. */}
-          <CommitGraph labels={hero.commitGraph} className="min-w-0 lg:w-[30rem]" />
+          <dl
+            className="enter-up mt-12 grid grid-cols-2 border-t border-l border-border"
+            style={{ animationDelay: "300ms" }}
+          >
+            {hero.status.map((cell) => (
+              <div
+                key={cell.key}
+                className="min-w-0 border-r border-b border-border px-4 py-3.5"
+              >
+                <dt className="font-mono text-[10px] tracking-[0.16em] text-fg-faint uppercase">
+                  {cell.key}
+                </dt>
+                <dd className="mt-1.5 font-mono text-xs text-fg">
+                  {cell.value === "__CLOCK__" ? <Clock /> : cell.value}
+                </dd>
+              </div>
+            ))}
+          </dl>
         </div>
 
-        <dl
-          className="enter-up mt-14 grid grid-cols-2 border-t border-l border-border sm:grid-cols-4"
-          style={{ animationDelay: "300ms" }}
-        >
-          {hero.status.map((cell) => (
-            <div
-              key={cell.key}
-              className="min-w-0 border-r border-b border-border px-4 py-3.5"
-            >
-              <dt className="font-mono text-[10px] tracking-[0.16em] text-fg-faint uppercase">
-                {cell.key}
-              </dt>
-              <dd className="mt-1.5 font-mono text-xs text-fg">
-                {cell.value === "__CLOCK__" ? <Clock /> : cell.value}
-              </dd>
-            </div>
-          ))}
-        </dl>
+        <CommitGraph
+          labels={hero.commitGraph}
+          className="min-w-0 lg:w-[30rem]"
+        />
       </Container>
 
       <div className="mt-16 border-y border-border bg-bg-elev py-3 md:mt-20">

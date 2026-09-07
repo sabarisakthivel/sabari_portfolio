@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 /* Rail geometry. The SVG keeps a fixed width so the node rings never distort;
    only the label columns beside it flex. The branch swings a long way out —
    that wide sweep is most of what gives the reference its shape. */
-const ROW = 88;
+const ROW = 100;
 const RAIL_W = 170;
 const TRUNK_X = 20;
 const BRANCH_X = 140;
