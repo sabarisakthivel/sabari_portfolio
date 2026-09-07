@@ -110,7 +110,9 @@ export const site = {
 } as const;
 
 export const loader = {
-  prompt: "sabari@vercel ~/portfolio $ pnpm build && vercel --prod",
+  // Split so the host can carry the accent colour, as in a real prompt.
+  host: "sabari@vercel",
+  command: ":~$ pnpm build && vercel --prod",
   stages: [
     { label: "Type-check", log: "› tsc --noEmit … 0 errors, strict mode" },
     { label: "Migrate", log: "› supabase db push … 65 migrations applied" },
