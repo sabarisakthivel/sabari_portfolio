@@ -4,13 +4,26 @@ import { m } from "motion/react";
 import { EASE, useReducedMotionSafe, VIEWPORT } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
-const ROW = 28;
-/** Row centres: the SVG rails and the label rows share this geometry. */
-const CENTRES = [14, 42, 70, 98, 126];
-const HEIGHT = ROW * 5;
+/* Geometry. The SVG rails and the HTML label rows share these numbers, so the
+   whole graph scales by changing ROW and the two lane positions. */
+const ROW = 38;
+const ROWS = 5;
+const HEIGHT = ROW * ROWS;
+const TRUNK_X = 11;
+const BRANCH_X = 31;
+const WIDTH = 42;
+const DOT_R = 4.5;
 
-const TRUNK = "M8 14 L8 126";
-const BRANCH = "M8 28 C8 36 24 34 24 42 L24 84 C24 92 8 90 8 98";
+/** Vertical centre of each row. */
+const CENTRES = Array.from({ length: ROWS }, (_, i) => ROW * i + ROW / 2);
+const [first, second, , fourth, last] = CENTRES;
+
+const TRUNK = `M${TRUNK_X} ${first} L${TRUNK_X} ${last}`;
+const BRANCH =
+  `M${TRUNK_X} ${first + ROW / 2} ` +
+  `C${TRUNK_X} ${first + ROW} ${BRANCH_X} ${second - ROW / 3} ${BRANCH_X} ${second} ` +
+  `L${BRANCH_X} ${fourth - ROW} ` +
+  `C${BRANCH_X} ${fourth - ROW / 3} ${TRUNK_X} ${fourth - ROW / 2} ${TRUNK_X} ${fourth}`;
 
 /**
  * Requirements §S-2 / M-7 — decorative `git log --graph` of the last year:
@@ -45,25 +58,25 @@ export function CommitGraph({
     <div className={cn("relative max-w-sm", className)} role="presentation">
       <svg
         aria-hidden
-        width="32"
+        width={WIDTH}
         height={HEIGHT}
-        viewBox={`0 0 32 ${HEIGHT}`}
+        viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
         fill="none"
         className="absolute top-0 left-0"
       >
         <m.path
           d={TRUNK}
           stroke="var(--border-strong)"
-          strokeWidth="1.5"
+          strokeWidth="2"
           strokeLinecap="round"
           {...draw(0)}
         />
         <m.path
           d={BRANCH}
           stroke="var(--accent-2)"
-          strokeWidth="1.5"
+          strokeWidth="2"
           strokeLinecap="round"
-          opacity="0.7"
+          opacity="0.75"
           {...draw(0.25)}
         />
 
@@ -73,12 +86,12 @@ export function CommitGraph({
           return (
             <m.circle
               key={cy}
-              cx={onBranch ? 24 : 8}
+              cx={onBranch ? BRANCH_X : TRUNK_X}
               cy={cy}
-              r="3.5"
+              r={DOT_R}
               fill={isLast ? "var(--accent)" : "var(--bg)"}
               stroke={onBranch ? "var(--accent-2)" : "var(--accent)"}
-              strokeWidth="1.5"
+              strokeWidth="2"
               initial={{ opacity: 0, scale: 0.4 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={VIEWPORT}
@@ -94,21 +107,27 @@ export function CommitGraph({
       </svg>
 
       <m.ol
-        className="ml-11"
+        className="ml-14"
         initial="hidden"
         whileInView="visible"
         viewport={VIEWPORT}
-        variants={{ visible: { transition: { staggerChildren: 0.14, delayChildren: 0.3 } } }}
+        variants={{
+          visible: { transition: { staggerChildren: 0.14, delayChildren: 0.3 } },
+        }}
       >
         {labels.map((label, index) => (
           <m.li
             key={label}
             variants={{
               hidden: { opacity: 0, x: -6 },
-              visible: { opacity: 1, x: 0, transition: { duration: 0.4, ease: EASE } },
+              visible: {
+                opacity: 1,
+                x: 0,
+                transition: { duration: 0.4, ease: EASE },
+              },
             }}
             className={cn(
-              "flex items-center font-mono text-[11px]",
+              "flex items-center font-mono text-[13px] whitespace-nowrap",
               index === labels.length - 1 ? "text-accent" : "text-fg-muted",
             )}
             style={{ height: `${ROW}px` }}

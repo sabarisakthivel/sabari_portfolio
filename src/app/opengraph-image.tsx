@@ -31,12 +31,11 @@ export default async function OpengraphImage() {
             viewBox="0 0 64 64"
             fill="none"
             stroke={tokens.accent}
-            strokeWidth={11}
+            strokeWidth={13}
             strokeLinecap="butt"
+            strokeLinejoin="miter"
           >
-            <path d="M52 11 H27 a11 11 0 0 0 -11 11 v3" />
-            <path d="M16 25 L48 46" />
-            <path d="M12 53 H37 a11 11 0 0 0 11 -11 v-3" />
+            <path d="M53 12 H29 a10 10 0 0 0 -10 10 L46 42 a10 10 0 0 1 -10 10 H11" />
           </svg>
           {/* One text node: Satori requires explicit display on any element
               with more than one child, and JSX interpolation splits this. */}

@@ -558,30 +558,6 @@ export const built = {
       language: "Java",
       role: "author",
     },
-    {
-      name: "Java",
-      url: "https://github.com/sabarisakthivel/Java",
-      description:
-        "Core Java learning repository: data types, arrays, OOP, collections and hands-on example programs.",
-      language: "Java",
-      role: "author",
-    },
-    {
-      name: "Instagram_Clone",
-      url: "https://github.com/sabarisakthivel/Instagram_Clone",
-      description:
-        "Responsive Instagram-inspired UI in React + Bootstrap — feed, stories and suggestions from JSON data with reusable components.",
-      language: "JavaScript",
-      role: "author",
-    },
-    {
-      name: "login_validation",
-      url: "https://github.com/sabarisakthivel/login_validation",
-      description:
-        "React login demo focused on input validation and clear error handling.",
-      language: "JavaScript",
-      role: "author",
-    },
   ] satisfies Repo[],
   publication: {
     label: "publication",
@@ -599,14 +575,6 @@ export const built = {
       location: "Erode, Tamil Nadu",
       period: "2021 → 2025",
       score: "CGPA 7.38 / 10",
-    },
-    {
-      degree: "HSC",
-      field: "Higher Secondary",
-      institution: "PKD Matriculation Higher Secondary School",
-      location: "Pollachi, Tamil Nadu",
-      period: "2020 → 2021",
-      score: "93.79%",
     },
   ],
 };
