@@ -171,14 +171,17 @@ function OpsMock() {
               stroke="var(--accent)"
               strokeWidth="2"
               strokeLinecap="round"
-              {...(reduced
-                ? {}
-                : {
-                    initial: { pathLength: 0 },
-                    whileInView: { pathLength: 1 },
-                    viewport: VIEWPORT,
-                    transition: { duration: 1.2, ease: EASE, delay: 0.3 },
-                  })}
+              // Props stay mounted; only the duration changes. Removing them
+              // when `reduced` resolves after hydration left this path stuck
+              // at the server's pathLength 0 — an invisible route line.
+              initial={{ pathLength: 0 }}
+              whileInView={{ pathLength: 1 }}
+              viewport={VIEWPORT}
+              transition={
+                reduced
+                  ? { duration: 0 }
+                  : { duration: 1.2, ease: EASE, delay: 0.3 }
+              }
             />
             <circle cx="14" cy="74" r="3.5" fill="var(--accent)" />
             <circle cx="52" cy="40" r="2.5" fill="var(--accent-2)" />

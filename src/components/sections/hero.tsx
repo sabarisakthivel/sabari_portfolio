@@ -77,9 +77,9 @@ export function Hero() {
             </div>
           </div>
 
-          <div className="min-w-0 lg:border-l lg:border-border lg:pl-14">
-            <CommitGraph labels={hero.commitGraph} />
-          </div>
+          {/* No divider: the reference lets the trunk itself be the vertical
+              line in this part of the hero. */}
+          <CommitGraph labels={hero.commitGraph} className="min-w-0 lg:w-[26rem]" />
         </div>
 
         <dl
