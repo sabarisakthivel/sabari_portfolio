@@ -52,7 +52,7 @@ export function Hero() {
             className="enter-up mt-6 text-[clamp(2.75rem,9vw,8rem)] leading-[0.9] font-extrabold tracking-[-0.05em] uppercase"
             style={{ animationDelay: "60ms" }}
           >
-            <DecodeText text={hero.name} className="inline-block" />
+            <DecodeText text={hero.name} autoPlay className="inline-block" />
           </h1>
 
           {/* M-5 — types in once the name has landed */}

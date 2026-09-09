@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { INTRO_DONE_EVENT } from "@/components/layout/build-log";
 import { useReducedMotionSafe } from "@/lib/motion";
 
 /**
@@ -12,10 +13,14 @@ const GLYPHS = "!<>-_\\/[]{}=+*^?#01";
 /** Milliseconds before the next character locks into place. */
 const LOCK_MS = 55;
 
+/** Beat after the intro lifts before the name decodes itself. */
+const AUTOPLAY_DELAY_MS = 260;
+
 const randomGlyph = () => GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
 
 /**
- * Hover-to-decode: the text flips to random glyphs and resolves left to right.
+ * Decode effect: the text flips to random glyphs and resolves left to right.
+ * Runs on hover, and once on load when `autoPlay` is set.
  *
  * The real string is what renders at rest and what ships in the HTML, so
  * crawlers and no-JS visitors only ever see the name, and a screen-reader-only
@@ -26,9 +31,12 @@ const randomGlyph = () => GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
 export function DecodeText({
   text,
   className,
+  autoPlay = false,
 }: {
   text: string;
   className?: string;
+  /** Play once on load as well as on hover. */
+  autoPlay?: boolean;
 }) {
   const reduced = useReducedMotionSafe();
   const [display, setDisplay] = useState(text);
@@ -78,6 +86,45 @@ export function DecodeText({
 
     rafRef.current = requestAnimationFrame(tick);
   }, [reduced, text]);
+
+  /**
+   * Play once when the page settles. It waits for the loading overlay for the
+   * same reason the commit graph does: this sits above the fold, so running it
+   * on mount would play the whole thing behind the intro and finish before the
+   * name was ever visible.
+   */
+  useEffect(() => {
+    if (!autoPlay || reduced) return;
+
+    let playTimer: number | undefined;
+    let fallback: number | undefined;
+    let started = false;
+
+    // Guarded and self-cancelling: the fallback timer used to survive the real
+    // signal and fire a second run about a second after the first.
+    const start = () => {
+      if (started) return;
+      started = true;
+      window.clearTimeout(fallback);
+      window.removeEventListener(INTRO_DONE_EVENT, start);
+      playTimer = window.setTimeout(run, AUTOPLAY_DELAY_MS);
+    };
+
+    const w = window as { __introDone?: boolean; __introSkip?: number };
+    if (w.__introDone || w.__introSkip === 1) {
+      start();
+    } else {
+      window.addEventListener(INTRO_DONE_EVENT, start);
+      // Safety net so the name is never left un-run if the signal never arrives.
+      fallback = window.setTimeout(start, 4500);
+    }
+
+    return () => {
+      window.removeEventListener(INTRO_DONE_EVENT, start);
+      window.clearTimeout(fallback);
+      window.clearTimeout(playTimer);
+    };
+  }, [autoPlay, reduced, run]);
 
   return (
     <span className={className} onPointerEnter={run}>
