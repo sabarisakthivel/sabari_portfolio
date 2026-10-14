@@ -1,120 +1,91 @@
-import { Button } from "@/components/ui/button";
-import { Clock } from "@/components/ui/clock";
-import { CommitGraph } from "@/components/ui/commit-graph";
-import { Container } from "@/components/ui/container";
-import { DecodeText } from "@/components/ui/decode-text";
-import { Marquee } from "@/components/ui/marquee";
-import { Typewriter } from "@/components/ui/typewriter";
-import { hero } from "@/data/content";
+import { ContactButton } from "@/components/ui/contact-button";
+import { FadeIn } from "@/components/ui/fade-in";
+import { Magnetic } from "@/components/ui/magnetic";
+import { Parallax } from "@/components/ui/parallax";
+import { SplitHeading } from "@/components/ui/split-heading";
+import { TiltPortrait } from "@/components/ui/tilt-portrait";
+import { hero, nav } from "@/data/content";
 import { isResolved } from "@/lib/utils";
 
-/** Two ticker rows travelling in opposite directions (M-6). */
-const half = Math.ceil(hero.marquee.length / 2);
-const marqueeRows = [hero.marquee.slice(0, half), hero.marquee.slice(half)];
+/** "Hi, I'm" and "Sabari" — split so phones can stack them. */
+const splitAt = hero.greeting.lastIndexOf(" ");
+const greetingLead = hero.greeting.slice(0, splitAt);
+const greetingName = hero.greeting.slice(splitAt + 1);
+
+/** Items whose href is still a TODO_ placeholder never render. */
+const links = nav.filter((item) => isResolved(item.href));
 
 /**
- * Requirements §S-2.
- *
- * Two columns from lg: all the copy on the left, the commit graph running the
- * full height on the right. The name previously spanned the full width, which
- * pushed the graph below the divider and left it sitting far lower than its
- * counterpart on the reference.
- *
- * Everything here is on screen at load, so it uses the CSS `enter-up`
- * entrance rather than the scroll-reveal wrappers — those hold content at
- * opacity 0 until hydration, which delays the hero heading's paint and with it
- * the page's LCP.
+ * Full-height opener over the laser backdrop: nav, the giant greeting whose
+ * letters flip up once the deploy log lifts, the floating portrait, and the
+ * blurb plus contact pill along the bottom. Scrolling away pulls the heading
+ * up and lets the portrait sink and shrink — two depths parting.
  */
 export function Hero() {
   return (
     <section
       id="hero"
       aria-labelledby="hero-heading"
-      className="relative scroll-mt-24 pt-14 md:pt-20"
+      className="relative flex h-svh min-h-[34rem] flex-col overflow-x-clip"
     >
-      {/* M-15 — slow-drifting wash, purely decorative */}
-      <div
-        aria-hidden
-        className="fade-in-top pointer-events-none absolute inset-0 -z-10 overflow-hidden"
-      >
-        <span className="blob-a absolute -top-44 -left-40 size-[38rem] rounded-full" />
-        <span className="blob-b absolute -top-24 right-0 size-[30rem] rounded-full" />
+      <FadeIn as="nav" y={-20} waitForIntro className="relative z-20 px-6 pt-6 md:px-10 md:pt-8">
+        <ul className="flex items-center justify-between text-sm font-medium tracking-wider text-fg uppercase md:text-lg lg:text-[1.4rem]">
+          {links.map((item) => (
+            <li key={item.label}>
+              <a
+                href={item.href}
+                {...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : undefined)}
+                className="transition-opacity duration-200 hover:opacity-70"
+              >
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </FadeIn>
+
+      <Parallax anchor="top" range={-160} className="overflow-hidden">
+        <SplitHeading
+          as="h1"
+          id="hero-heading"
+          waitForIntro
+          delay={0.1}
+          lines={[greetingLead, greetingName]}
+          lineClassName="block sm:inline"
+          className="mt-8 w-full text-center text-[22vw] leading-[0.92] font-black tracking-tight uppercase sm:mt-4 sm:text-[13.2vw] sm:leading-none sm:whitespace-nowrap md:-mt-2 lg:text-[15vw]"
+        />
+      </Parallax>
+
+      <div className="absolute top-1/2 left-1/2 z-10 w-[280px] -translate-x-1/2 -translate-y-1/2 sm:top-auto sm:bottom-0 sm:w-[360px] sm:translate-y-0 md:w-[440px] lg:w-[600px] xl:w-[660px]">
+        <Parallax anchor="top" range={140} scaleTo={0.82}>
+          <FadeIn delay={0.6} y={60} waitForIntro>
+            <div className="float-b">
+              <TiltPortrait
+                src={hero.portrait.src}
+                alt={hero.portrait.alt}
+                width={hero.portrait.width}
+                height={hero.portrait.height}
+              />
+            </div>
+          </FadeIn>
+        </Parallax>
       </div>
 
-      <Container className="grid items-start gap-14 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-16">
-        <div className="min-w-0">
-          <p className="enter-up font-mono text-xs tracking-[0.2em] text-accent uppercase">
-            {hero.eyebrow}
-          </p>
-
-          <h1
-            id="hero-heading"
-            className="enter-up mt-6 text-[clamp(2.75rem,9vw,8rem)] leading-[0.9] font-extrabold tracking-[-0.05em] uppercase"
-            style={{ animationDelay: "60ms" }}
-          >
-            <DecodeText text={hero.name} autoPlay className="inline-block" />
-          </h1>
-
-          {/* M-5 — types in once the name has landed */}
-          <Typewriter
-            text={hero.tagline}
-            startDelayMs={180}
-            className="mt-8 max-w-read text-lg leading-relaxed text-fg-muted"
-          />
-
-          <div
-            className="enter-up mt-8 flex flex-wrap items-center gap-3"
-            style={{ animationDelay: "220ms" }}
-          >
-            <Button href={hero.ctas.primary.href} variant="primary">
-              {hero.ctas.primary.label}
-            </Button>
-            <Button href={hero.ctas.secondary.href}>
-              {hero.ctas.secondary.label}
-            </Button>
-            {/* TODO: resume button renders once site.links.resume is set */}
-            {isResolved(hero.ctas.resume.href) ? (
-              <Button href={hero.ctas.resume.href} external>
-                {hero.ctas.resume.label}
-              </Button>
-            ) : null}
-          </div>
-
-          <dl
-            className="enter-up mt-12 grid grid-cols-2 border-t border-l border-border"
-            style={{ animationDelay: "300ms" }}
-          >
-            {hero.status.map((cell) => (
-              <div
-                key={cell.key}
-                className="min-w-0 border-r border-b border-border px-4 py-3.5"
-              >
-                <dt className="font-mono text-[10px] tracking-[0.16em] text-fg-faint uppercase">
-                  {cell.key}
-                </dt>
-                <dd className="mt-1.5 font-mono text-xs text-fg">
-                  {cell.value === "__CLOCK__" ? <Clock /> : cell.value}
-                </dd>
-              </div>
-            ))}
-          </dl>
-        </div>
-
-        <CommitGraph
-          labels={hero.commitGraph}
-          className="min-w-0 lg:w-[30rem]"
-        />
-      </Container>
-
-      <div className="mt-16 border-y border-border bg-bg-elev py-3 md:mt-20">
-        {marqueeRows.map((row, index) => (
-          <Marquee
-            key={index}
-            items={row}
-            direction={index === 0 ? "left" : "right"}
-            durationSeconds={index === 0 ? 40 : 46}
-          />
-        ))}
+      <div className="relative z-20 mt-auto flex flex-col items-center gap-5 px-6 pb-8 text-center sm:flex-row sm:items-end sm:justify-between sm:gap-6 sm:text-left md:px-10 md:pb-10">
+        <FadeIn
+          as="p"
+          delay={0.45}
+          y={20}
+          waitForIntro
+          className="max-w-[300px] text-[clamp(0.85rem,1.4vw,1.5rem)] leading-snug font-light tracking-wide text-fg uppercase sm:max-w-[240px] md:max-w-[300px]"
+        >
+          {hero.blurb}
+        </FadeIn>
+        <FadeIn delay={0.6} y={20} waitForIntro className="w-full sm:w-auto">
+          <Magnetic className="w-full sm:w-auto">
+            <ContactButton href="#contact" className="w-full sm:w-auto" />
+          </Magnetic>
+        </FadeIn>
       </div>
     </section>
   );

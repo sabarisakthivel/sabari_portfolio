@@ -1,18 +1,21 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, JetBrains_Mono } from "next/font/google";
+import { JetBrains_Mono, Kanit } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { BuildLog } from "@/components/layout/build-log";
 import { Footer } from "@/components/layout/footer";
-import { Navbar } from "@/components/layout/navbar";
 import { SkipLink } from "@/components/layout/skip-link";
 import { MotionProvider } from "@/components/motion-provider";
+import { SmoothScroll } from "@/components/smooth-scroll";
+import { LaserBackdrop } from "@/components/ui/laser-backdrop";
+import { ScrollProgress } from "@/components/ui/scroll-progress";
 import { built, site, work } from "@/data/content";
 import { siteUrl } from "@/lib/site-url";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const kanit = Kanit({
+  variable: "--font-kanit",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "700", "900"],
   display: "swap",
 });
 
@@ -99,7 +102,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: site.themeColor,
-  colorScheme: "light",
+  colorScheme: "dark",
 };
 
 export default function RootLayout({
@@ -110,7 +113,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${jetbrainsMono.variable} dot-grid`}
+        className={`${kanit.variable} ${jetbrainsMono.variable}`}
       >
         {/* Runs before the overlay is parsed, so the skip decision is made
             before the first paint rather than after hydration. */}
@@ -125,11 +128,15 @@ export default function RootLayout({
 
         <MotionProvider>
           <SkipLink />
+          <SmoothScroll />
+          <LaserBackdrop />
+          <ScrollProgress />
           <BuildLog />
-          <Navbar />
           {children}
           <Footer />
         </MotionProvider>
+        {/* static film grain over everything */}
+        <div aria-hidden className="grain pointer-events-none fixed inset-0 z-[80] hidden sm:block" />
         {/* The script only exists on Vercel; rendering it elsewhere just logs
             a 404. VERCEL is set automatically on their builds. */}
         {process.env.VERCEL ? <Analytics /> : null}

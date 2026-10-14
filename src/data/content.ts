@@ -41,6 +41,8 @@ export interface FeaturedProject {
   features: { title: string; text: string }[];
   tech: string[];
   mockTheme: "ops" | "matrimony"; // drives the BrowserFrame abstract UI colours
+  /** Screenshots of the live product, in public/shots: desktop frames, plus a phone frame for narrow screens. */
+  shots: { top: string; bottom: string; tall: string; wide: string };
 }
 
 export interface NavItem {
@@ -86,7 +88,7 @@ export const site = {
     "Software Developer Coimbatore",
     "GoldenAxe Technology Solutions",
   ],
-  themeColor: "#F2F5F2",
+  themeColor: "#0C0C0C",
   location: {
     city: "Coimbatore",
     region: "Tamil Nadu",
@@ -111,7 +113,7 @@ export const site = {
 
 export const loader = {
   // Split so the host can carry the accent colour, as in a real prompt.
-  host: "sabari@vercel",
+  host: "sabari",
   command: ":~$ pnpm build && vercel --prod",
   stages: [
     { label: "Type-check", log: "› tsc --noEmit … 0 errors, strict mode" },
@@ -123,11 +125,9 @@ export const loader = {
 };
 
 export const nav: NavItem[] = [
-  { label: "Home", href: "#hero" },
   { label: "About", href: "#about" },
   { label: "Work", href: "#work" },
-  { label: "Stack", href: "#stack" },
-  { label: "Built", href: "#built" },
+  { label: "Projects", href: "#built" },
   { label: "Resume", href: "TODO_RESUME_URL", external: true },
   { label: "Contact", href: "#contact" },
 ];
@@ -135,6 +135,14 @@ export const nav: NavItem[] = [
 export const hero = {
   eyebrow: "Full Stack Developer",
   name: "SABARI S",
+  // The giant hero line; the apostrophe is typographic.
+  greeting: "Hi, I’m Sabari",
+  // TODO: placeholder — this is the design template's "Jack" character, not
+  // Sabari. Replace public/hero/portrait.webp with Sabari's own avatar
+  // (transparent background, about 1040×1126) and update the size below.
+  portrait: { src: "/hero/portrait.webp", alt: "3D cartoon portrait", width: 1040, height: 1126 },
+  // The opening of `tagline`, short enough for the hero's corner block.
+  blurb: "I build and ship production web platforms end-to-end",
   tagline:
     "I build and ship production web platforms end-to-end — database design, APIs, PWA frontends, deployment — as the only developer on the codebase.",
   ctas: {
@@ -216,6 +224,7 @@ export const hero = {
 
 export const about = {
   label: "01 — About",
+  title: "About me",
   headline: ["A product is not done when it compiles.", "It's done when real users depend on it."],
   highlight: "real users depend on it",
   lead:
@@ -242,6 +251,7 @@ export const about = {
 
 export const work = {
   label: "02 — Git log --career",
+  title: "Experience",
   headline: "Deployment history.",
   roles: [
     {
@@ -325,9 +335,17 @@ export const stats = {
 
 export const stack = {
   label: "03 — Skill",
+  title: "Skills",
   headline: "The toolchain, declared.",
   kicker:
     "Everything below has shipped to production in the last year — not a wishlist.",
+  // Logo rows that slide under the hero. Names map to icons in
+  // src/lib/tech-icons.ts; anything without an icon is skipped there.
+  logosLabel: "Tech stack",
+  logos: [
+    ["Next.js", "React", "TypeScript", "JavaScript", "HTML5", "CSS3", "Tailwind CSS", "PWA", "Supabase", "PostgreSQL", "MCP", "JSON"],
+    ["Java", "Spring Boot", "Hibernate", "MySQL", "Maven", "Docker", "Vercel", "Netlify", "Git", "GitHub", "Postman", "Claude", "IntelliJ IDEA", "PhonePe", "Python", "TensorFlow"],
+  ],
   filename: "stack.json",
   modeComment: "// mode: ship_end_to_end  · one dev · schema → UI → deploy",
   groups: [
@@ -466,6 +484,8 @@ export const stack = {
 
 export const built = {
   label: "04 — SELECT * FROM projects WHERE status = 'live'",
+  title: "Projects",
+  moreTitle: "Also built",
   headline: "Shipped, not claimed.",
   featured: [
     {
@@ -503,6 +523,12 @@ export const built = {
         "MCP",
       ],
       mockTheme: "ops",
+      shots: {
+        top: "/shots/zora-d0.webp",
+        bottom: "/shots/zora-d2.webp",
+        tall: "/shots/zora-m0.webp",
+        wide: "/shots/zora-d3.webp",
+      },
     },
     {
       id: "knk",
@@ -538,6 +564,12 @@ export const built = {
         "PDF Generation",
       ],
       mockTheme: "matrimony",
+      shots: {
+        top: "/shots/knk-d0.webp",
+        bottom: "/shots/knk-d1.webp",
+        tall: "/shots/knk-m0.webp",
+        wide: "/shots/knk-d2.webp",
+      },
     },
   ] satisfies FeaturedProject[],
   reposLabel: "open source · github.com/sabarisakthivel",
@@ -581,6 +613,7 @@ export const built = {
 
 export const contact = {
   label: "05 — Contact",
+  title: "Contact",
   headline: ["Let's connect", "and build something real."],
   highlight: "build something real",
   body:
@@ -618,6 +651,8 @@ export const ui = {
     closeMenu: "Close menu",
   },
   statusOnline: "online",
+  contactButton: "Contact Me",
+  liveProject: "Live Project",
   work: {
     head: "HEAD",
     current: "now",

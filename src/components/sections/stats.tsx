@@ -1,51 +1,33 @@
 import { CountUp } from "@/components/ui/count-up";
-import { MonoLabel } from "@/components/ui/mono-label";
-import { Reveal, RevealItem, Stagger } from "@/components/ui/reveal";
-import { Section } from "@/components/ui/section";
+import { FadeIn } from "@/components/ui/fade-in";
 import { stats } from "@/data/content";
 
-/** Requirements §S-5 and M-10. */
+/** Four big numbers that count up once in view. */
 export function Stats() {
   return (
-    <Section id="stats" labelledBy="stats-heading">
-      <Reveal className="border-t border-border pt-8">
-        <MonoLabel>{stats.label}</MonoLabel>
-        <div className="mt-5">
-          <h2
-            id="stats-heading"
-            className="text-[clamp(1.625rem,3vw,2.25rem)] font-semibold tracking-[-0.03em]"
-          >
-            {stats.headline}
-          </h2>
-          <p className="mt-2 text-fg-muted">{stats.sub}</p>
-        </div>
-      </Reveal>
+    <section
+      id="stats"
+      aria-labelledby="stats-heading"
+      className="px-5 pt-6 pb-28 sm:px-8 sm:pb-32 md:px-10 md:pb-40"
+    >
+      <FadeIn className="text-center">
+        <h2 id="stats-heading" className="text-[clamp(1.5rem,3.4vw,3rem)] leading-tight font-medium uppercase">
+          {stats.headline}
+        </h2>
+        <p className="mt-2 font-light text-fg-muted">{stats.sub}</p>
+      </FadeIn>
 
-      {/* Open figures on hairlines — no filled cells. */}
-      <Stagger
-        as="dl"
-        className="mt-14 grid border-t border-border sm:grid-cols-2 lg:grid-cols-4"
-      >
-        {stats.items.map((item) => (
-          <RevealItem
-            key={item.label}
-            className="border-b border-border py-8 lg:border-b-0 lg:border-l lg:border-border lg:pr-6 lg:pl-8 lg:first:border-l-0 lg:first:pl-0"
-          >
-            <dt className="sr-only">{item.label}</dt>
-            <dd>
-              <span className="block font-mono text-[clamp(2.75rem,5vw,3.75rem)] leading-none font-medium tracking-[-0.05em] text-accent tabular-nums">
-                <CountUp value={item.value} />
-                {item.suffix ? (
-                  <span className="text-accent/55">{item.suffix}</span>
-                ) : null}
-              </span>
-              <span className="mt-5 block max-w-[22ch] text-sm text-fg-muted">
-                {item.label}
-              </span>
+      <dl className="mx-auto mt-14 grid max-w-7xl grid-cols-2 gap-x-6 gap-y-12 md:mt-20 lg:grid-cols-4 lg:gap-x-10">
+        {stats.items.map((item, index) => (
+          <FadeIn key={item.label} delay={index * 0.12} rotateX={-60} y={50} className="flex flex-col-reverse items-center justify-end text-center">
+            <dt className="mt-3 max-w-[16rem] text-sm leading-snug font-light text-fg-muted">{item.label}</dt>
+            <dd className="hero-heading text-[clamp(3.25rem,12vw,6rem)] leading-none font-black tabular-nums lg:text-[clamp(3.5rem,5.6vw,5.5rem)]">
+              <CountUp value={item.value} />
+              {item.suffix ?? ""}
             </dd>
-          </RevealItem>
+          </FadeIn>
         ))}
-      </Stagger>
-    </Section>
+      </dl>
+    </section>
   );
 }

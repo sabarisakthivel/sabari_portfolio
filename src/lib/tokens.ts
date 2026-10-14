@@ -7,13 +7,13 @@
  * the source of truth for everything rendered in the browser.
  */
 export const tokens = {
-  bg: "#f2f5f2",
-  bgElev: "#ffffff",
-  bgElev2: "#eaeeea",
-  border: "#dbe1dc",
-  fg: "#0d1210",
-  fgMuted: "#3f4a44",
-  fgFaint: "#5d6963",
-  accent: "#0d7a4e",
-  accent2: "#0a5a3a",
+  bg: "#0c0c0c",
+  bgElev: "#141416",
+  bgElev2: "#1c1c21",
+  border: "#2a2d31",
+  fg: "#d7e2ea",
+  fgMuted: "#a3afb8",
+  fgFaint: "#808b94",
+  accent: "#e46ad9",
+  accent2: "#b48cf0",
 } as const;
