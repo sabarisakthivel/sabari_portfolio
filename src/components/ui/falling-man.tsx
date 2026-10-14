@@ -15,6 +15,135 @@ const DROP = 0.9;
 /** Frame time the pose freezes at under reduced motion — a balanced silhouette. */
 const STILL_T = 0;
 
+type Three = typeof import("three");
+type Vec3 = InstanceType<Three["Vector3"]>;
+
+/**
+ * Laptop centre relative to his hips, in body axes (x = his left, y = toward
+ * head, z = his front) and world units at HEIGHT 3.2: just above the thighs.
+ */
+const LAPTOP_AT = { x: 0, y: 0.14, z: 0.46 };
+
+/** Base footprint and thickness; the lid shares the footprint. */
+const LAPTOP_W = 0.78;
+const LAPTOP_D = 0.52;
+const LAPTOP_T = 0.035;
+
+/**
+ * Yaw that looks over his shoulder onto the screen, and how far he sways
+ * either side of it. A full spin hid the screen half the time.
+ */
+const VIEW_YAW = Math.PI;
+const SWAY = 0.5;
+
+/** How far past upright the lid leans away from him, in radians. */
+const LID_LEAN = 0.32;
+
+/**
+ * Editor-style screen: a dark ground with indented lines of syntax-coloured
+ * bars. Drawn once to a canvas, so it costs one small texture.
+ */
+function drawScreen(css: CSSStyleDeclaration): HTMLCanvasElement {
+  const read = (name: string) => css.getPropertyValue(name).trim();
+  const canvas = document.createElement("canvas");
+  canvas.width = 512;
+  canvas.height = 340;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return canvas;
+
+  ctx.fillStyle = read("--fg");
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const palette = [
+    read("--accent"),
+    read("--syntax-str"),
+    read("--syntax-num"),
+    read("--fg-faint"),
+  ];
+  // indent, then segment widths per line — a shape, not real code
+  const lines: [number, number[]][] = [
+    [0, [90, 140]], [1, [60, 110, 70]], [2, [150, 50]], [2, [80, 120]],
+    [1, [40]], [1, [110, 90, 40]], [2, [70, 160]], [3, [120]], [2, [60, 60]],
+    [1, [40]], [0, [30]], [0, [100, 80]],
+  ];
+  let y = 26;
+  lines.forEach(([indent, segments], row) => {
+    let x = 26 + indent * 28;
+    segments.forEach((width, index) => {
+      ctx.fillStyle = palette[(row + index) % palette.length];
+      ctx.fillRect(x, y, width, 10);
+      x += width + 12;
+    });
+    y += 24;
+  });
+  return canvas;
+}
+
+/**
+ * The laptop, in its own body-axis frame: base centred on the origin, lid
+ * hinged on the far edge and opened back toward him, screen facing him.
+ * `grip(side, out)` writes the world position of the base's left (-1) or
+ * right (+1) edge — where each hand takes hold.
+ */
+function buildLaptop(
+  THREE: Three,
+  token: (name: string) => InstanceType<Three["Color"]>,
+  css: CSSStyleDeclaration,
+) {
+  const group = new THREE.Group();
+  // brushed aluminium
+  const shell = new THREE.MeshStandardMaterial({
+    color: token("--bg-elev-2"),
+    roughness: 0.35,
+    metalness: 0.55,
+  });
+
+  const base = new THREE.Mesh(
+    new THREE.BoxGeometry(LAPTOP_W, LAPTOP_T, LAPTOP_D),
+    shell,
+  );
+  group.add(base);
+
+  // hinge on the far edge; the lid stands up from it and leans away a little
+  const hinge = new THREE.Group();
+  hinge.position.set(0, LAPTOP_T / 2, LAPTOP_D / 2);
+  hinge.rotation.x = LID_LEAN;
+  group.add(hinge);
+
+  const lid = new THREE.Mesh(
+    new THREE.BoxGeometry(LAPTOP_W, LAPTOP_D, LAPTOP_T * 0.7),
+    shell,
+  );
+  lid.position.set(0, LAPTOP_D / 2, 0);
+  hinge.add(lid);
+
+  // Unlit, so it reads as a glowing panel whatever the scene lighting does.
+  const screenTexture = new THREE.CanvasTexture(drawScreen(css));
+  screenTexture.colorSpace = THREE.SRGBColorSpace;
+  const screen = new THREE.Mesh(
+    new THREE.PlaneGeometry(LAPTOP_W * 0.92, LAPTOP_D * 0.88),
+    new THREE.MeshBasicMaterial({ map: screenTexture, toneMapped: false }),
+  );
+  screen.rotation.y = Math.PI; // face back toward him
+  screen.position.set(0, LAPTOP_D / 2, -(LAPTOP_T * 0.35 + 0.002));
+  hinge.add(screen);
+
+  // the screen's glow on his face and hands
+  const glow = new THREE.PointLight(token("--accent"), 2.5, 2.2, 2);
+  glow.position.set(0, LAPTOP_D * 0.5, -0.25);
+  hinge.add(glow);
+
+  const local = new THREE.Vector3();
+  const grip = (side: -1 | 1, out: Vec3) => {
+    // his left is +x in body axes; grab just behind the middle of each side
+    local.set(-side * (LAPTOP_W / 2), 0, -LAPTOP_D * 0.1);
+    group.updateMatrixWorld(true);
+    return out.copy(group.localToWorld(local));
+  };
+
+  return { group, grip };
+}
+
 /**
  * The falling figure behind the first screen, ported from Motion.html.
  *
@@ -194,7 +323,23 @@ export function FallingMan({
       qBody.setFromRotationMatrix(new THREE.Matrix4().makeBasis(left, up, front));
       qBodyInv.copy(qBody).invert();
 
-      // ---------- falling pose: back-first, limbs pushed up by the air ----------
+      // ---------- laptop on his lap ----------
+      // Built from boxes rather than shipped as a model. It hangs off `pivot`,
+      // whose origin is his hips, so it tumbles with him; its axes are his body
+      // axes (x = his left, y = toward head, z = his front).
+      const laptop = buildLaptop(THREE, token, css);
+      laptop.group.quaternion.copy(qBody);
+      laptop.group.position
+        .set(LAPTOP_AT.x, LAPTOP_AT.y, LAPTOP_AT.z)
+        .applyQuaternion(qBody);
+      pivot.add(laptop.group);
+
+      const gripL = new THREE.Vector3();
+      const gripR = new THREE.Vector3();
+      const towards = (from: string, to: InstanceType<typeof THREE.Vector3>) =>
+        to.clone().sub(wp(from)).normalize();
+
+      // ---------- falling pose: sitting into the fall, working on the laptop ----------
       const pose = (t: number) => {
         rest.forEach((q, b) => b.quaternion.copy(q));
         spin.position.set(0, 0, 0);
@@ -204,24 +349,32 @@ export function FallingMan({
         scene.updateMatrixWorld(true);
 
         const w = (k: number) => Math.sin(t * k);
-        const j = (k: number) => 0.07 * Math.sin(t * k); // fast wind flutter
-        aim("spine2", "neck", dir(0, 1, 0.3 + j(7)));
-        aim("head", "headtopend", dir(0, 0.8, 0.6 + j(9)));
-        aim("leftarm", "leftforearm", dir(0.6 + 0.15 * w(5.3), 0.45 + 0.25 * w(4.1) + j(13), 0.65));
-        aim("leftforearm", "lefthand", dir(0.3, 0.7 + 0.2 * w(6.2), 0.65 + j(15)));
-        aim("rightarm", "rightforearm", dir(-0.6 - 0.15 * w(4.7), 0.4 + 0.25 * w(5.6) + j(12), 0.65));
-        aim("rightforearm", "righthand", dir(-0.3, 0.7 + 0.2 * w(5.9), 0.65 + j(14)));
-        aim("leftupleg", "leftleg", dir(0.22, -0.5 + 0.18 * w(3.3), 0.85 + j(11)));
-        aim("leftleg", "leftfoot", dir(0.12, -0.95, 0.3 + 0.25 * w(4.6) + j(10)));
-        aim("rightupleg", "rightleg", dir(-0.22, -0.75 + 0.18 * w(2.9), 0.6 + j(12)));
-        aim("rightleg", "rightfoot", dir(-0.1, -0.75, -0.3 + 0.25 * w(4.1) + j(9)));
+        const j = (k: number) => 0.05 * Math.sin(t * k); // fast wind flutter
+        // hunched over the screen, head tipped down to read it
+        aim("spine2", "neck", dir(0, 1, 0.18 + j(7)));
+        aim("head", "headtopend", dir(0, 0.7, 0.75 + j(9)));
+        // elbows out and down, then each forearm reaches for a side of the base
+        laptop.grip(-1, gripL);
+        laptop.grip(1, gripR);
+        aim("leftarm", "leftforearm", dir(0.45, -0.7 + j(13), 0.35));
+        aim("leftforearm", "lefthand", towards("leftforearm", gripL));
+        aim("rightarm", "rightforearm", dir(-0.45, -0.7 + j(12), 0.35));
+        aim("rightforearm", "righthand", towards("rightforearm", gripR));
+        // seated: thighs forward to make a lap, shins hanging; the right leg
+        // kicks loose in the wind
+        aim("leftupleg", "leftleg", dir(0.16, -0.12 + j(11), 1));
+        aim("leftleg", "leftfoot", dir(0.06, -1, 0.18 + 0.12 * w(3.6)));
+        aim("rightupleg", "rightleg", dir(-0.18, -0.2 + 0.1 * w(2.9), 0.95));
+        aim("rightleg", "rightfoot", dir(-0.08, -0.7, 0.55 + 0.25 * w(4.1) + j(9)));
 
         // head-down diagonal, chest facing the sky, swaying
         euler.set(-1.15 + 0.12 * Math.sin(t * 0.9), 1 + 0.2 * Math.sin(t * 0.6), 0);
         qD.setFromEuler(euler);
         pivot.quaternion.copy(qD).multiply(qBodyInv);
         outer.rotation.z = 1 + 0.15 * Math.sin(t * 0.7);
-        spin.rotation.y = t * 0.4; // continuous slow spin
+        // sway around the over-the-shoulder view rather than spinning, so the
+        // screen stays readable
+        spin.rotation.y = VIEW_YAW + SWAY * Math.sin(t * 0.35);
         spin.position.set(
           // air buffeting
           0.04 * Math.sin(t * 17) + 0.03 * Math.sin(t * 23),
