@@ -173,6 +173,13 @@
   );
 }
 
+/* Fades a layer in from its top edge — keeps the hero's wash from starting on
+   a hard line where it slides up over the first screen. */
+@utility fade-in-top {
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 10rem);
+  mask-image: linear-gradient(to bottom, transparent, #000 10rem);
+}
+
 /* Blinking block cursor used at the end of a CodePanel (Requirements §S-2) */
 @keyframes caret-blink {
   0%,
@@ -266,6 +273,22 @@
 /* Reveals that start with the page rather than waiting for an in-view trigger. */
 .type-char-auto {
   animation-play-state: running;
+}
+
+/* The arrow under the first screen's scroll cue nudges downward. Collapsed by
+   the reduced-motion rule below. */
+@keyframes scroll-nudge {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(4px);
+  }
+}
+
+@utility scroll-cue {
+  animation: scroll-nudge 1.6s ease-in-out infinite;
 }
 
 /* Slow-drifting background wash behind the hero (M-15). Radial gradients

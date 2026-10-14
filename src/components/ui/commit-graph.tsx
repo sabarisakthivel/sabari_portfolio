@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useRef } from "react";
 import { m } from "motion/react";
 import type { Variants } from "motion/react";
-import { INTRO_DONE_EVENT } from "@/components/layout/build-log";
 import { EASE, useReducedMotionSafe } from "@/lib/motion";
+import { usePlayWhenSeen } from "@/lib/use-play-when-seen";
 import { cn } from "@/lib/utils";
 
 /* Rail geometry. The SVG keeps a fixed width so the node rings never distort;
@@ -34,9 +34,9 @@ const DRAW: Variants = {
 /**
  * Decorative `git log --graph` of the last year, sitting beside the hero copy.
  *
- * It waits for the loading intro before animating. Anything above the fold
- * plays out behind that overlay otherwise, so by the time the page is revealed
- * the draw has already finished and nobody sees it.
+ * It draws once the loading intro has finished and the hero has scrolled into
+ * view — it sits below the falling-figure screen, so playing any earlier would
+ * finish the draw before anyone sees it.
  */
 export function CommitGraph({
   labels,
@@ -46,23 +46,8 @@ export function CommitGraph({
   className?: string;
 }) {
   const reduced = useReducedMotionSafe();
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    const w = window as { __introDone?: boolean; __introSkip?: number };
-    if (w.__introDone || w.__introSkip === 1) {
-      setReady(true);
-      return;
-    }
-    const onDone = () => setReady(true);
-    window.addEventListener(INTRO_DONE_EVENT, onDone);
-    // Safety net: never leave the graph hidden if the intro fails to signal.
-    const fallback = window.setTimeout(onDone, 4500);
-    return () => {
-      window.removeEventListener(INTRO_DONE_EVENT, onDone);
-      window.clearTimeout(fallback);
-    };
-  }, []);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const ready = usePlayWhenSeen(rootRef);
 
   const rows = labels.length;
   const height = ROW * rows;
@@ -86,6 +71,7 @@ export function CommitGraph({
 
   return (
     <div
+      ref={rootRef}
       role="presentation"
       className={cn(
         "grid items-center",

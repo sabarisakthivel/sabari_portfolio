@@ -35,7 +35,7 @@ export function Hero() {
       {/* M-15 — slow-drifting wash, purely decorative */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
+        className="fade-in-top pointer-events-none absolute inset-0 -z-10 overflow-hidden"
       >
         <span className="blob-a absolute -top-44 -left-40 size-[38rem] rounded-full" />
         <span className="blob-b absolute -top-24 right-0 size-[30rem] rounded-full" />
