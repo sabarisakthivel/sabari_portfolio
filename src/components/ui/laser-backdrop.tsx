@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { m, useScroll, useTransform } from "motion/react";
 import { useReducedMotionSafe } from "@/lib/motion";
+import { useLiteMotion } from "@/lib/use-lite-motion";
 
 /**
  * Fixed full-page backdrop: zig-zag steel ribbons with hot edges, laser
@@ -24,7 +25,24 @@ const FAR = "M -160 120 L 760 250 L 120 520 L 980 700 L -140 960";
 const NEAR_W = 72;
 const FAR_W = 44;
 
-function RibbonArt({ d, width }: { d: string; width: number }) {
+function RibbonArt({ d, width, lite }: { d: string; width: number; lite: boolean }) {
+  // Phones: one static SVG, with the glow faked by a wide translucent stroke —
+  // no blur filter and no extra animated layer to hold in GPU memory.
+  if (lite) {
+    return (
+      <svg
+        viewBox="0 0 1000 1000"
+        className="absolute inset-0 size-full"
+        fill="none"
+        strokeLinejoin="miter"
+        strokeMiterlimit={12}
+      >
+        <path d={d} stroke="url(#lb-edge)" strokeOpacity={0.18} strokeWidth={width + 30} />
+        <path d={d} stroke="url(#lb-edge)" strokeWidth={width} />
+        <path d={d} stroke="url(#lb-metal)" strokeWidth={width - 6} />
+      </svg>
+    );
+  }
   return (
     <>
       <svg
@@ -115,6 +133,10 @@ function Lasers({ d, width, speed, count }: { d: string; width: number; speed: n
 
 export function LaserBackdrop() {
   const reduced = useReducedMotionSafe();
+  const lite = useLiteMotion();
+  // phones: the ribbon stays put — scroll-linked transforms on a full-screen
+  // layer are what made mobile scrolling stutter
+  const still = reduced || lite;
   const sceneRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll();
   const rotate = useTransform(scrollYProgress, [0, 1], [-6, 14]);
@@ -160,38 +182,44 @@ export function LaserBackdrop() {
         </defs>
       </svg>
 
-      {/* far ribbon — thinner, dimmer, counter-rotating for depth */}
-      <m.div
-        className="absolute top-1/2 left-1/2 opacity-30 will-change-transform"
-        style={reduced ? { scale: 1.2 } : { rotate: farRotate, scale: 1.2 }}
-      >
-        <div className="scene-box">
-          <RibbonArt d={FAR} width={FAR_W} />
-          {!reduced ? <Lasers d={FAR} width={FAR_W} speed={14} count={1} /> : null}
-        </div>
-      </m.div>
+      {/* far ribbon — thinner, dimmer, counter-rotating for depth (desktop only) */}
+      {!lite ? (
+        <m.div
+          className="absolute top-1/2 left-1/2 opacity-30 will-change-transform"
+          style={still ? { scale: 1.2 } : { rotate: farRotate, scale: 1.2 }}
+        >
+          <div className="scene-box">
+            <RibbonArt d={FAR} width={FAR_W} lite={false} />
+            {!reduced ? <Lasers d={FAR} width={FAR_W} speed={14} count={1} /> : null}
+          </div>
+        </m.div>
+      ) : null}
 
       {/* near ribbon */}
       <m.div
-        className="absolute top-1/2 left-1/2 opacity-80 will-change-transform"
-        style={reduced ? { scale: 1.08 } : { rotate, scale }}
+        className={`absolute top-1/2 left-1/2 opacity-80 ${still ? "" : "will-change-transform"}`}
+        style={still ? { scale: 1.08 } : { rotate, scale }}
       >
         <div className="scene-box">
-          <RibbonArt d={NEAR} width={NEAR_W} />
-          {!reduced ? <Lasers d={NEAR} width={NEAR_W} speed={10} count={2} /> : null}
+          <RibbonArt d={NEAR} width={NEAR_W} lite={lite} />
+          {!reduced ? <Lasers d={NEAR} width={NEAR_W} speed={10} count={lite ? 1 : 2} /> : null}
         </div>
       </m.div>
 
-      {/* beams */}
+      {/* beams — one on phones */}
       <span className="beam top-[22%]" style={{ ["--speed" as string]: "12s", ["--delay" as string]: "-2s" }} />
-      <span
-        className="beam top-[58%]"
-        style={{ ["--speed" as string]: "15s", ["--delay" as string]: "-9s", ["--angle" as string]: "18deg" }}
-      />
-      <span
-        className="beam top-[84%] hidden sm:block"
-        style={{ ["--speed" as string]: "18s", ["--delay" as string]: "-5s" }}
-      />
+      {!lite ? (
+        <>
+          <span
+            className="beam top-[58%]"
+            style={{ ["--speed" as string]: "15s", ["--delay" as string]: "-9s", ["--angle" as string]: "18deg" }}
+          />
+          <span
+            className="beam top-[84%]"
+            style={{ ["--speed" as string]: "18s", ["--delay" as string]: "-5s" }}
+          />
+        </>
+      ) : null}
 
       {/* vignette keeps text readable over the brightest folds */}
       <div

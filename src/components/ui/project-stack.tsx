@@ -6,6 +6,7 @@ import { m, useScroll, useTransform, type MotionValue } from "motion/react";
 import { PillLink } from "@/components/ui/pill-link";
 import { type FeaturedProject, ui } from "@/data/content";
 import { useReducedMotionSafe } from "@/lib/motion";
+import { useLiteMotion } from "@/lib/use-lite-motion";
 
 /**
  * Sticky cards that pile up as you scroll: each one pins near the top and
@@ -45,6 +46,9 @@ function ProjectCard({
   progress: MotionValue<number>;
 }) {
   const reduced = useReducedMotionSafe();
+  // phones: cards still pin and stack, but never rescale — rescaling big
+  // image cards every frame is what made the stack judder
+  const still = useLiteMotion() || reduced;
   const targetScale = 1 - (total - 1 - index) * 0.03;
   const scale = useTransform(progress, [index / total, 1], [1, targetScale]);
   // each card after the first arrives tipped toward the viewer and settles flat
@@ -58,8 +62,8 @@ function ProjectCard({
     <div className="sticky top-20 flex min-h-[85svh] items-start justify-center md:top-32">
       <m.article
         style={{
-          scale: reduced ? 1 : scale,
-          rotateX: reduced ? 0 : rotateX,
+          scale: still ? 1 : scale,
+          rotateX: still ? 0 : rotateX,
           transformPerspective: 1400,
           top: `${index * 28}px`,
         }}

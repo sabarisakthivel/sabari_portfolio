@@ -293,6 +293,15 @@
   animation: glow-turn 22s linear infinite;
 }
 
+/* Phones: the contact glow holds still and blurs less — a large blur on a
+   rotating layer is costly on mobile GPUs. */
+@media (pointer: coarse), (max-width: 767px) {
+  .glow-orb {
+    animation: none;
+    filter: blur(50px);
+  }
+}
+
 /* Static film grain over the whole page. An SVG turbulence tile, so no image
    request and nothing animates. */
 @utility grain {

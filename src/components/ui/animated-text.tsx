@@ -6,9 +6,10 @@ import { useReducedMotionSafe } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
 /**
- * A paragraph that lights up character by character as it scrolls through the
- * viewport (opacity 0.2 → 1). Screen readers get the plain text; the per-
- * character layer is hidden from them. Reduced motion renders it fully lit.
+ * A paragraph that lights up word by word as it scrolls through the viewport
+ * (opacity 0.2 → 1). Word-level rather than letter-level: the same effect at
+ * a glance, with roughly a sixth of the animated elements — which matters on
+ * phones. Screen readers get the plain text; reduced motion renders it lit.
  */
 export function AnimatedText({
   text,
@@ -27,51 +28,41 @@ export function AnimatedText({
   if (reduced) return <p className={className}>{text}</p>;
 
   const words = text.split(" ");
-  const total = text.length;
-  let cursor = 0;
 
   return (
     <p ref={ref} className={cn("relative", className)}>
       <span className="sr-only">{text}</span>
       <span aria-hidden>
-        {words.map((word, wi) => {
-          const start = cursor;
-          cursor += word.length + 1;
-          return (
-            <span key={wi} className="inline-block whitespace-nowrap">
-              {Array.from(word).map((char, ci) => (
-                <Char
-                  key={ci}
-                  char={char}
-                  progress={scrollYProgress}
-                  range={[(start + ci) / total, (start + ci + 1) / total]}
-                />
-              ))}
-              {wi < words.length - 1 ? " " : null}
-            </span>
-          );
-        })}
+        {words.map((word, index) => (
+          <Word
+            key={index}
+            word={word}
+            progress={scrollYProgress}
+            range={[index / words.length, (index + 1) / words.length]}
+            last={index === words.length - 1}
+          />
+        ))}
       </span>
     </p>
   );
 }
 
-function Char({
-  char,
+function Word({
+  word,
   progress,
   range,
+  last,
 }: {
-  char: string;
+  word: string;
   progress: MotionValue<number>;
   range: [number, number];
+  last: boolean;
 }) {
   const opacity = useTransform(progress, range, [0.2, 1]);
   return (
-    <span className="relative">
-      <span className="invisible">{char}</span>
-      <m.span style={{ opacity }} className="absolute inset-0">
-        {char}
-      </m.span>
-    </span>
+    <>
+      <m.span style={{ opacity }}>{word}</m.span>
+      {last ? null : " "}
+    </>
   );
 }
