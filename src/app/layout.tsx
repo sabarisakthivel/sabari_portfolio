@@ -113,7 +113,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${kanit.variable} ${jetbrainsMono.variable}`}
+        className={`${kanit.variable} ${jetbrainsMono.variable} relative`}
       >
         {/* Runs before the overlay is parsed, so the skip decision is made
             before the first paint rather than after hydration. */}

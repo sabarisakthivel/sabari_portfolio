@@ -134,8 +134,6 @@ function Lasers({ d, width, speed, count }: { d: string; width: number; speed: n
 export function LaserBackdrop() {
   const reduced = useReducedMotionSafe();
   const lite = useLiteMotion();
-  // phones: the ribbon stays put — scroll-linked transforms on a full-screen
-  // layer are what made mobile scrolling stutter
   const still = reduced || lite;
   const sceneRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll();
@@ -153,6 +151,15 @@ export function LaserBackdrop() {
     window.addEventListener("resize", fit);
     return () => window.removeEventListener("resize", fit);
   }, []);
+
+  // Phones: a still ribbon painted as part of the page (absolute, not fixed).
+  // A fixed layer under transparent content forced the whole 10,000px page
+  // into extra GPU layers — ~490MB — which is what made phones crawl.
+  if (lite) {
+    return (
+      <div aria-hidden className="ribbon-static pointer-events-none absolute inset-0 -z-10" />
+    );
+  }
 
   return (
     <div

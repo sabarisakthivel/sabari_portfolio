@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { m, useScroll, useTransform, type MotionValue } from "motion/react";
 import { useReducedMotionSafe } from "@/lib/motion";
+import { useLiteMotion } from "@/lib/use-lite-motion";
 import { cn } from "@/lib/utils";
 
 /**
@@ -19,13 +20,14 @@ export function AnimatedText({
   className?: string;
 }) {
   const reduced = useReducedMotionSafe();
+  const lite = useLiteMotion(); // phones: plain text, no per-scroll updates
   const ref = useRef<HTMLParagraphElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start 0.8", "end 0.2"],
   });
 
-  if (reduced) return <p className={className}>{text}</p>;
+  if (reduced || lite) return <p ref={ref} className={className}>{text}</p>;
 
   const words = text.split(" ");
 

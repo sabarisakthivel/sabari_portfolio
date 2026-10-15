@@ -2,6 +2,7 @@
 
 import { m, type Variants } from "motion/react";
 import { useIntroDone } from "@/lib/use-intro-done";
+import { useLiteMotion } from "@/lib/use-lite-motion";
 import { cn } from "@/lib/utils";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
@@ -43,7 +44,32 @@ export function SplitHeading({
   delay?: number;
 }) {
   const introDone = useIntroDone();
+  const lite = useLiteMotion();
   const Tag = as;
+
+  // Phones: the whole heading fades up as one piece — dozens of 3D-flipping
+  // letters per heading is too many layers for a mobile GPU.
+  if (lite) {
+    return (
+      <Tag id={id} className={className}>
+        <m.span
+          className={cn("block", letterClassName)}
+          initial={{ opacity: 0, y: 16 }}
+          {...(waitForIntro
+            ? { animate: introDone ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 } }
+            : { whileInView: { opacity: 1, y: 0 }, viewport: { once: true, margin: "0px 0px 25% 0px" } })}
+          transition={{ duration: 0.45, delay: waitForIntro ? delay : 0, ease: EASE }}
+        >
+          {lines.map((line, li) => (
+            <span key={li} className={cn("inline-block", lineClassName)}>
+              {line}
+              {li < lines.length - 1 ? " " : null}
+            </span>
+          ))}
+        </m.span>
+      </Tag>
+    );
+  }
 
   return (
     <Tag id={id} className={className}>
